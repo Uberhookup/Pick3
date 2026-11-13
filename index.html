@@ -7,7 +7,7 @@
 <title>Pick3 &amp; Pick4 POS</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <style>
-/* ===== POS core (unchanged from previous version) ===== */
+/* ===== POS core ===== */
 :root{--safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);--bg:#070a10;--bg-2:#0b1018;--surface:#111823;--surface-2:#16202e;--surface-3:#1e2a3c;--line:#1b2534;--line-2:#2a3a4f;--text:#e9eef7;--text-2:#b7c4d8;--muted:#6b7c95;--muted-2:#8ea0bb;--yellow:#fbbf24;--yellow-2:#f59e0b;--green:#22c55e;--green-2:#15803d;--win:#4ade80;--blue:#3b82f6;--blue-2:#2563eb;--red:#ef4444;--red-2:#b91c1c;--r-sm:10px;--r-md:14px;--r-lg:18px;--shadow-1:0 2px 10px rgba(0,0,0,.35);--shadow-2:0 10px 30px rgba(0,0,0,.5);--shadow-3:0 24px 70px rgba(0,0,0,.7)}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
@@ -28,6 +28,9 @@ body{position:fixed;inset:0;display:flex;flex-direction:column;overflow:hidden;b
 .brand-clock .tz{font-size:8px;font-weight:900;color:#7ec8f6;letter-spacing:.5px;padding:1px 4px;border-radius:3px;background:rgba(59,130,246,.14)}
 .currency-badge{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;height:22px;padding:0 6px;border-radius:6px;font-size:10px;font-weight:900;background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.4);color:var(--yellow);cursor:pointer;transition:transform .12s}
 .currency-badge:active{transform:scale(.92)}
+.lang-badge{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;height:22px;padding:0 7px;border-radius:6px;font-size:10px;font-weight:900;letter-spacing:.4px;background:rgba(139,92,246,.16);border:1px solid rgba(139,92,246,.45);color:#c4b5fd;cursor:pointer;transition:transform .12s,background .12s}
+.lang-badge:active{transform:scale(.92)}
+.lang-badge:hover{background:rgba(139,92,246,.26)}
 .device-badge{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:7px;font-size:11px;cursor:default;transition:background .15s,border-color .15s,color .15s;border:1px solid var(--line-2);background:var(--surface-2);color:var(--muted-2)}
 body[data-device="desktop"] .device-badge{background:rgba(59,130,246,.16);border-color:rgba(59,130,246,.36);color:#93c5fd}
 body[data-device="mobile"] .device-badge{background:rgba(34,197,94,.16);border-color:rgba(34,197,94,.36);color:#86efac}
@@ -253,7 +256,43 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
 .cooldown-note.blocked{background:rgba(239,68,68,.10);border-color:rgba(239,68,68,.28);color:#fca5a5}
 .deleted-notice{margin:0;padding:12px 16px;background:rgba(239,68,68,.14);border-bottom:1px solid rgba(239,68,68,.28);color:#fca5a5;font-size:11px;font-weight:800;letter-spacing:.4px;text-align:center;line-height:1.4}
 
-/* ===== Fallback inline monitor modal (used only if popup is blocked) ===== */
+/* ===== HOW TO PLAY ===== */
+.btn-howto{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;gap:5px;height:24px;padding:0 8px;border-radius:7px;font-size:8px;font-weight:900;letter-spacing:.9px;background:rgba(59,130,246,.16);border:1px solid rgba(59,130,246,.4);color:#93c5fd;cursor:pointer;font-family:inherit;white-space:nowrap;transition:transform .12s,background .12s,box-shadow .12s,color .12s}
+.btn-howto:active{transform:scale(.94)}
+.btn-howto.open{background:rgba(59,130,246,.32);color:#dbeafe;box-shadow:0 0 0 3px rgba(59,130,246,.16)}
+.btn-howto i{font-size:10px}
+.howto-panel{position:fixed;top:calc(62px + var(--safe-t));left:12px;right:12px;z-index:85;max-height:calc(100vh - 78px - var(--safe-t) - var(--safe-b));display:flex;flex-direction:column;background:linear-gradient(180deg,var(--surface-2),var(--bg-2));border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--shadow-3);overflow:hidden;opacity:0;transform:translateY(-8px) scale(.985);pointer-events:none;transition:opacity .18s,transform .18s}
+.howto-panel.open{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+@media (min-width:720px){.howto-panel{left:auto;right:16px;width:460px;top:calc(64px + var(--safe-t))}}
+.howto-head{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--surface-2),var(--surface))}
+.howto-head h4{font-size:11px;font-weight:900;letter-spacing:1.8px;color:var(--text);text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.howto-head h4 i{color:var(--blue);font-size:12px}
+.howto-close{width:30px;height:30px;flex:0 0 30px;border-radius:8px;border:1px solid var(--line-2);background:var(--surface-3);color:var(--text-2);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;font-family:inherit;transition:transform .12s,background .12s}
+.howto-close:active{transform:scale(.92);background:#2c3b52}
+.howto-body{flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:14px 16px 18px;display:flex;flex-direction:column;gap:16px}
+.howto-sec-title{font-size:9px;font-weight:900;letter-spacing:1.6px;color:var(--yellow);text-transform:uppercase;margin-bottom:7px;display:flex;align-items:center;gap:6px}
+.howto-sec-title i{font-size:10px;color:var(--yellow-2)}
+.howto-list{display:flex;flex-direction:column;gap:5px}
+.howto-item{display:flex;gap:8px;align-items:flex-start;padding:6px 8px;border-radius:6px;background:rgba(255,255,255,.02);border:1px solid var(--line);font-size:11px;line-height:1.45;color:var(--text-2);font-weight:600}
+.howto-item .n{flex:0 0 18px;height:18px;border-radius:5px;background:rgba(59,130,246,.18);border:1px solid rgba(59,130,246,.35);color:#93c5fd;font-size:9px;font-weight:900;display:flex;align-items:center;justify-content:center;margin-top:1px;font-variant-numeric:tabular-nums}
+.howto-item .n i{font-size:8px}
+.howto-item b{color:var(--text);font-weight:800}
+.howto-item .kbd{display:inline-block;font-family:ui-monospace,Consolas,monospace;font-size:10px;font-weight:800;color:#0b1220;background:linear-gradient(180deg,#fde68a,#fbbf24);padding:0 5px;border-radius:4px;letter-spacing:.5px;vertical-align:1px}
+.howto-fmt{display:grid;grid-template-columns:64px 62px 1fr;gap:8px;align-items:center;padding:6px 8px;border-radius:6px;background:rgba(255,255,255,.02);border:1px solid var(--line);font-size:10.5px}
+.howto-fmt .name{font-weight:800;color:var(--text-2);letter-spacing:.3px}
+.howto-fmt code{font-family:ui-monospace,Consolas,monospace;font-weight:900;color:var(--yellow);letter-spacing:.5px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.22);border-radius:4px;padding:2px 4px;text-align:center}
+.howto-fmt .desc{color:var(--muted-2);font-weight:600;line-height:1.3}
+.howto-pay{display:flex;gap:8px;align-items:baseline;padding:6px 8px;border-radius:6px;background:rgba(255,255,255,.02);border:1px solid var(--line);font-size:10.5px}
+.howto-pay .name{flex:0 0 56px;font-weight:900;color:var(--yellow);letter-spacing:.6px;font-size:9.5px}
+.howto-pay .val{color:var(--text-2);font-weight:600;line-height:1.35}
+@media (max-width:600px){
+  .topbar{padding-left:10px;padding-right:10px}
+  .brand{gap:6px}
+  .btn-howto{width:24px;padding:0}
+  .btn-howto span{display:none}
+}
+
+/* ===== Fallback monitor modal ===== */
 .modal-card.monitor-card{max-width:1000px;width:100%;height:calc(90vh - var(--safe-t) - var(--safe-b));max-height:90vh;background:#fff}
 .monitor-head{flex:0 0 auto;background:#333;color:#f3f4f6;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #000;border-radius:var(--r-lg) var(--r-lg) 0 0}
 .monitor-title{font-size:18px;font-weight:800;letter-spacing:1px;display:flex;align-items:center;gap:12px}
@@ -338,6 +377,10 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
         <span class="tz">ET</span>
       </div>
     </div>
+    <button type="button" class="btn-howto" id="btnHowto" aria-expanded="false" aria-controls="howtoPanel" title="How to play">
+      <i class="fas fa-circle-question"></i><span data-i18n="howToPlay">HOW TO PLAY</span>
+    </button>
+    <button type="button" class="lang-badge" id="langBadge" title="English">EN</button>
     <button type="button" class="currency-badge" id="currencyBadge" title="Click to change currency">USD</button>
     <div class="device-badge" id="deviceBadge" title="Detecting device…">
       <i class="fas fa-circle-notch fa-spin"></i>
@@ -357,32 +400,32 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
 
 <button class="lot-chip" id="lotChip" type="button">
   <span class="lot-dot" id="lotDot"></span>
-  <span class="lot-label">Lottery</span>
+  <span class="lot-label" data-i18n="lottery">Lottery</span>
   <span class="lot-name" id="lotName">TEXAS-EVENING</span>
   <span class="lot-chev"><i class="fas fa-chevron-down"></i></span>
 </button>
 
 <div class="entry">
   <div class="field active" id="fieldNum">
-    <div class="field-label">Number</div>
+    <div class="field-label" data-i18n="number">Number</div>
     <div class="box"><span class="ph">—</span></div>
   </div>
   <div class="field" id="fieldAmt">
-    <div class="field-label">Amount</div>
+    <div class="field-label" data-i18n="amount">Amount</div>
     <div class="box"><span class="ph">0.00</span></div>
   </div>
 </div>
 
 <section class="bets-panel">
   <div class="bets-head">
-    <span class="bets-title"><i class="fas fa-receipt"></i> Current Ticket</span>
+    <span class="bets-title"><i class="fas fa-receipt"></i> <span data-i18n="currentTicket">Current Ticket</span></span>
     <span class="bets-count" id="betsCount">0</span>
   </div>
   <div class="bets-grid" id="betsPanel">
-    <div class="bet-category"><div class="cat-head">PICK 2</div><div class="cat-table-wrap"><table class="cat-table"><thead><tr><th>LOT</th><th>NUM</th><th>AMT</th><th></th></tr></thead><tbody id="tbody_PICK2"><tr class="cat-empty"><td colspan="4">Empty</td></tr></tbody></table></div><div class="cat-totals"><span class="cnt" id="count_PICK2">0</span><span class="sum" id="total_PICK2">$0.00</span></div></div>
-    <div class="bet-category"><div class="cat-head">PALE</div><div class="cat-table-wrap"><table class="cat-table"><thead><tr><th>LOT</th><th>NUM</th><th>AMT</th><th></th></tr></thead><tbody id="tbody_PALE"><tr class="cat-empty"><td colspan="4">Empty</td></tr></tbody></table></div><div class="cat-totals"><span class="cnt" id="count_PALE">0</span><span class="sum" id="total_PALE">$0.00</span></div></div>
-    <div class="bet-category"><div class="cat-head">PICK 3</div><div class="cat-table-wrap"><table class="cat-table"><thead><tr><th>LOT</th><th>NUM</th><th>AMT</th><th></th></tr></thead><tbody id="tbody_PICK3"><tr class="cat-empty"><td colspan="4">Empty</td></tr></tbody></table></div><div class="cat-totals"><span class="cnt" id="count_PICK3">0</span><span class="sum" id="total_PICK3">$0.00</span></div></div>
-    <div class="bet-category"><div class="cat-head">PICK 4</div><div class="cat-table-wrap"><table class="cat-table"><thead><tr><th>LOT</th><th>NUM</th><th>AMT</th><th></th></tr></thead><tbody id="tbody_PICK4"><tr class="cat-empty"><td colspan="4">Empty</td></tr></tbody></table></div><div class="cat-totals"><span class="cnt" id="count_PICK4">0</span><span class="sum" id="total_PICK4">$0.00</span></div></div>
+    <div class="bet-category"><div class="cat-head" data-i18n="catPick2">PICK 2</div><div class="cat-table-wrap"><table class="cat-table"><thead><tr><th data-i18n="colLot">LOT</th><th data-i18n="colNum">NUM</th><th data-i18n="colAmt">AMT</th><th></th></tr></thead><tbody id="tbody_PICK2"><tr class="cat-empty"><td colspan="4" data-i18n="empty">Empty</td></tr></tbody></table></div><div class="cat-totals"><span class="cnt" id="count_PICK2">0</span><span class="sum" id="total_PICK2">$0.00</span></div></div>
+    <div class="bet-category"><div class="cat-head" data-i18n="catPale">PALE</div><div class="cat-table-wrap"><table class="cat-table"><thead><tr><th data-i18n="colLot">LOT</th><th data-i18n="colNum">NUM</th><th data-i18n="colAmt">AMT</th><th></th></tr></thead><tbody id="tbody_PALE"><tr class="cat-empty"><td colspan="4" data-i18n="empty">Empty</td></tr></tbody></table></div><div class="cat-totals"><span class="cnt" id="count_PALE">0</span><span class="sum" id="total_PALE">$0.00</span></div></div>
+    <div class="bet-category"><div class="cat-head" data-i18n="catPick3">PICK 3</div><div class="cat-table-wrap"><table class="cat-table"><thead><tr><th data-i18n="colLot">LOT</th><th data-i18n="colNum">NUM</th><th data-i18n="colAmt">AMT</th><th></th></tr></thead><tbody id="tbody_PICK3"><tr class="cat-empty"><td colspan="4" data-i18n="empty">Empty</td></tr></tbody></table></div><div class="cat-totals"><span class="cnt" id="count_PICK3">0</span><span class="sum" id="total_PICK3">$0.00</span></div></div>
+    <div class="bet-category"><div class="cat-head" data-i18n="catPick4">PICK 4</div><div class="cat-table-wrap"><table class="cat-table"><thead><tr><th data-i18n="colLot">LOT</th><th data-i18n="colNum">NUM</th><th data-i18n="colAmt">AMT</th><th></th></tr></thead><tbody id="tbody_PICK4"><tr class="cat-empty"><td colspan="4" data-i18n="empty">Empty</td></tr></tbody></table></div><div class="cat-totals"><span class="cnt" id="count_PICK4">0</span><span class="sum" id="total_PICK4">$0.00</span></div></div>
   </div>
 </section>
 
@@ -394,34 +437,82 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
 </div>
 
 <div class="actions">
-  <button type="button" id="btnPay" class="btn-pay"><i class="fas fa-money-bill-wave"></i><span>PAY</span></button>
-  <button type="button" id="btnSales" class="btn-sales"><i class="fas fa-chart-line"></i><span>SALES</span></button>
-  <button type="button" id="btnResults" class="btn-results"><i class="fas fa-list"></i><span>RESULTS</span></button>
-  <button type="button" id="btnTickets" class="btn-tickets"><i class="fas fa-ticket"></i><span>TICKETS</span></button>
+  <button type="button" id="btnPay" class="btn-pay"><i class="fas fa-money-bill-wave"></i><span data-i18n="pay">PAY</span></button>
+  <button type="button" id="btnSales" class="btn-sales"><i class="fas fa-chart-line"></i><span data-i18n="sales">SALES</span></button>
+  <button type="button" id="btnResults" class="btn-results"><i class="fas fa-list"></i><span data-i18n="results">RESULTS</span></button>
+  <button type="button" id="btnTickets" class="btn-tickets"><i class="fas fa-ticket"></i><span data-i18n="tickets">TICKETS</span></button>
+</div>
+
+<!-- ===== HOW TO PLAY panel ===== -->
+<div class="howto-panel" id="howtoPanel" role="dialog" aria-label="How to play">
+  <div class="howto-head">
+    <h4><i class="fas fa-circle-info"></i> <span data-i18n="howToPlayTitle">How to Play</span></h4>
+    <button type="button" class="howto-close" id="howtoClose" aria-label="Close"><i class="fas fa-xmark"></i></button>
+  </div>
+  <div class="howto-body">
+    <section>
+      <div class="howto-sec-title"><i class="fas fa-bolt"></i> <span data-i18n="quickStart">Quick Start</span></div>
+      <div class="howto-list">
+        <div class="howto-item"><span class="n">1</span><span data-i18n="qs1">Select lottery from the chip</span></div>
+        <div class="howto-item"><span class="n">2</span><span data-i18n="qs2">Enter number + amount</span></div>
+        <div class="howto-item"><span class="n">3</span><span><span data-i18n="qs3a">Press</span> <span class="kbd">ENTER</span> <span data-i18n="qs3b">to add bet</span></span></div>
+        <div class="howto-item"><span class="n">4</span><span><span data-i18n="qs4a">Repeat or press</span> <span class="kbd">ENTER</span> <span data-i18n="qs4b">on empty to preview ticket</span></span></div>
+      </div>
+    </section>
+    <section>
+      <div class="howto-sec-title"><i class="fas fa-hashtag"></i> <span data-i18n="numberFormats">Number Formats</span></div>
+      <div class="howto-list">
+        <div class="howto-fmt"><span class="name" data-i18n="fmtStraight">Straight</span><code>1234</code><span class="desc" data-i18n="fmtStraightDesc">Exact match wins</span></div>
+        <div class="howto-fmt"><span class="name" data-i18n="fmtBox">Box</span><code>1234.</code><span class="desc" data-i18n="fmtBoxDesc">Any order</span></div>
+        <div class="howto-fmt"><span class="name" data-i18n="fmtPale">Pale</span><code>1234+</code><span class="desc" data-i18n="fmtPaleDesc">First 2 + Last 2</span></div>
+        <div class="howto-fmt"><span class="name" data-i18n="fmtCombo">Combo</span><code>1234Q</code><span class="desc" data-i18n="fmtComboDesc">12x34 permutations</span></div>
+        <div class="howto-fmt"><span class="name" data-i18n="fmtWildcard">Wildcard</span><code>1X2X</code><span class="desc" data-i18n="fmtWildcardDesc">X matches any digit</span></div>
+      </div>
+    </section>
+    <section>
+      <div class="howto-sec-title"><i class="fas fa-coins"></i> <span data-i18n="payouts">Payouts</span></div>
+      <div class="howto-list">
+        <div class="howto-pay"><span class="name">PICK2</span><span class="val" data-i18n="payPick2">$65 straight</span></div>
+        <div class="howto-pay"><span class="name">PICK3</span><span class="val" data-i18n="payPick3">$650 straight · $80 box3 · $100 box6</span></div>
+        <div class="howto-pay"><span class="name">PICK4</span><span class="val" data-i18n="payPick4">$4,000 straight · $400 box4 · $250 box6 · $150 box12 · $100 box24</span></div>
+        <div class="howto-pay"><span class="name">PALE</span><span class="val" data-i18n="payPale">$800</span></div>
+        <div class="howto-pay"><span class="name" data-i18n="payPairsLabel">PAIRS</span><span class="val" data-i18n="payPairs">2d $6.5 · 3d $65/$15 · 4d $15/$10/$5</span></div>
+      </div>
+    </section>
+    <section>
+      <div class="howto-sec-title"><i class="fas fa-receipt"></i> <span data-i18n="ticketAndPayment">Ticket &amp; Payment</span></div>
+      <div class="howto-list">
+        <div class="howto-item"><span class="n"><i class="fas fa-eye"></i></span><span><span data-i18n="tp1a">Preview ticket: press</span> <span class="kbd">ENTER</span> <span data-i18n="tp1b">with empty fields</span></span></div>
+        <div class="howto-item"><span class="n"><i class="fas fa-print"></i></span><span data-i18n="tp2">Print or send via WhatsApp</span></div>
+        <div class="howto-item"><span class="n"><i class="fas fa-money-bill-wave"></i></span><span data-i18n="tp3">Pay button: enter ticket code to mark paid</span></div>
+        <div class="howto-item"><span class="n"><i class="fas fa-clock"></i></span><span data-i18n="tp4">Cancel window: 1 minute after sale</span></div>
+      </div>
+    </section>
+  </div>
 </div>
 
 <div class="backdrop" id="backdrop"></div>
 
-<div class="sheet" id="lotSheet"><div class="sheet-head">Select Lotteries</div><div class="sheet-body" id="lotSheetBody"></div><div class="sheet-foot"><button type="button" id="lotClose">Close</button></div></div>
+<div class="sheet" id="lotSheet"><div class="sheet-head" data-i18n="selectLotteries">Select Lotteries</div><div class="sheet-body" id="lotSheetBody"></div><div class="sheet-foot"><button type="button" id="lotClose" data-i18n="close">Close</button></div></div>
 <div class="sheet" id="ticketSheet">
-  <div class="sheet-head" id="ticketHead">Ticket Preview</div>
-  <div class="phone-row"><label for="phoneInput">WHATSAPP</label><input type="tel" id="phoneInput" placeholder="e.g. 15551234567" autocomplete="tel"></div>
+  <div class="sheet-head" id="ticketHead" data-i18n="ticketPreview">Ticket Preview</div>
+  <div class="phone-row"><label for="phoneInput" data-i18n="whatsapp">WHATSAPP</label><input type="tel" id="phoneInput" placeholder="e.g. 15551234567" autocomplete="tel"></div>
   <div class="sheet-body" id="ticketBody"></div>
   <div class="sheet-foot">
-    <button type="button" id="ticketSend" class="send"><i class="fab fa-whatsapp"></i> Send via WhatsApp</button>
-    <button type="button" id="ticketPrint"><i class="fas fa-print"></i> Print Ticket</button>
-    <button type="button" id="ticketClose">Cancel</button>
+    <button type="button" id="ticketSend" class="send"><i class="fab fa-whatsapp"></i> <span data-i18n="sendViaWhatsApp">Send via WhatsApp</span></button>
+    <button type="button" id="ticketPrint"><i class="fas fa-print"></i> <span data-i18n="printTicket">Print Ticket</span></button>
+    <button type="button" id="ticketClose" data-i18n="cancel">Cancel</button>
   </div>
 </div>
 <div class="sheet" id="cancelledTicketSheet">
-  <div class="sheet-head" id="cancelledTicketHead">Ticket Cancelled</div>
-  <div class="deleted-notice" style="background:rgba(239,68,68,.22);border-color:#ef4444;color:#fca5a5"><i class="fas fa-ban"></i> This ticket has been cancelled. Print or send a copy to the seller for their records.</div>
-  <div class="phone-row"><label for="cancelledTicketPhone">SELLER WHATSAPP</label><input type="tel" id="cancelledTicketPhone" placeholder="e.g. 15551234567" autocomplete="tel"></div>
+  <div class="sheet-head" id="cancelledTicketHead" data-i18n="ticketCancelled">Ticket Cancelled</div>
+  <div class="deleted-notice" style="background:rgba(239,68,68,.22);border-color:#ef4444;color:#fca5a5"><i class="fas fa-ban"></i> <span data-i18n="cancelledNotice">This ticket has been cancelled. Print or send a copy to the seller for their records.</span></div>
+  <div class="phone-row"><label for="cancelledTicketPhone" data-i18n="sellerWhatsapp">SELLER WHATSAPP</label><input type="tel" id="cancelledTicketPhone" placeholder="e.g. 15551234567" autocomplete="tel"></div>
   <div class="sheet-body" id="cancelledTicketBody"></div>
   <div class="sheet-foot">
-    <button type="button" id="cancelledTicketSend" class="send"><i class="fab fa-whatsapp"></i> Send Copy to Seller</button>
-    <button type="button" id="cancelledTicketPrint"><i class="fas fa-print"></i> Print Copy</button>
-    <button type="button" id="cancelledTicketClose">Close</button>
+    <button type="button" id="cancelledTicketSend" class="send"><i class="fab fa-whatsapp"></i> <span data-i18n="sendCopyToSeller">Send Copy to Seller</span></button>
+    <button type="button" id="cancelledTicketPrint"><i class="fas fa-print"></i> <span data-i18n="printCopy">Print Copy</span></button>
+    <button type="button" id="cancelledTicketClose" data-i18n="close">Close</button>
   </div>
 </div>
 
@@ -429,39 +520,39 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
   <div class="modal-backdrop" data-close="salesModal"></div>
   <div class="modal-card">
     <div class="modal-head col">
-      <h4>Sales Report</h4><div class="divider"></div>
-      <div class="date-range-container"><input type="date" id="fecha1xx"><span>to</span><input type="date" id="fecha2xx"></div>
-      <button type="button" class="btn-header" id="btn_report_search">SEARCH</button>
+      <h4 data-i18n="salesReport">Sales Report</h4><div class="divider"></div>
+      <div class="date-range-container"><input type="date" id="fecha1xx"><span data-i18n="to">to</span><input type="date" id="fecha2xx"></div>
+      <button type="button" class="btn-header" id="btn_report_search" data-i18n="search">SEARCH</button>
     </div>
     <div class="modal-body">
       <table class="sales-report-table"><tbody>
-        <tr><td colspan="2" class="section-header">Sales Summary</td></tr>
-        <tr><td class="lbl">OWNER:</td><td class="val" id="rpt_owner">—</td></tr>
-        <tr><td class="lbl">USERNAME:</td><td class="val" id="rpt_user">—</td></tr>
-        <tr><td class="lbl">PENDING PAYMENT:</td><td class="val" id="rpt_pendingPay">0.00</td></tr>
-        <tr><td class="lbl">PENDING TICKETS:</td><td class="val" id="rpt_pendingTickets">0</td></tr>
-        <tr><td class="lbl">OPEN VALUE (WEIGHTED):</td><td class="val" id="rpt_openWeighted">0.00</td></tr>
-        <tr><td class="lbl">LOSER TICKETS:</td><td class="val" id="rpt_loser">0</td></tr>
-        <tr><td class="lbl">WINNER TICKETS:</td><td class="val" id="rpt_winner">0</td></tr>
-        <tr><td class="lbl">RESULTS PENDING:</td><td class="val" id="rpt_pendingResults">0</td></tr>
-        <tr><td class="lbl">TOTAL TICKETS:</td><td class="val" id="rpt_totalTickets">0</td></tr>
-        <tr class="row-gray"><td class="lbl">TOTAL SALES:</td><td class="val strong" id="rpt_totalSales">0.00</td></tr>
-        <tr><td class="lbl">TOTAL PRIZES:</td><td class="val" id="rpt_totalPrizes">0.00</td></tr>
-        <tr class="row-gray"><td class="lbl">TOTAL SALES WEB:</td><td class="val strong" id="rpt_totalSalesWeb">0.00</td></tr>
-        <tr><td class="lbl">PRIZES WEB:</td><td class="val" id="rpt_prizesWeb">0.00</td></tr>
-        <tr><td class="lbl">COMMISSION (%):</td><td class="val" id="rpt_comm">0.00</td></tr>
-        <tr><td class="lbl">COMMISSION WEB (%):</td><td class="val" id="rpt_commWeb">0.00</td></tr>
-        <tr><td class="lbl">DISCOUNT:</td><td class="val" id="rpt_discount">0.00</td></tr>
-        <tr class="row-gray"><td class="lbl">PROFITS:</td><td class="val profit" id="rpt_profits">0.00</td></tr>
+        <tr><td colspan="2" class="section-header" data-i18n="salesSummary">Sales Summary</td></tr>
+        <tr><td class="lbl" data-i18n="lblOwner">OWNER:</td><td class="val" id="rpt_owner">—</td></tr>
+        <tr><td class="lbl" data-i18n="lblUsername">USERNAME:</td><td class="val" id="rpt_user">—</td></tr>
+        <tr><td class="lbl" data-i18n="lblPendingPayment">PENDING PAYMENT:</td><td class="val" id="rpt_pendingPay">0.00</td></tr>
+        <tr><td class="lbl" data-i18n="lblPendingTickets">PENDING TICKETS:</td><td class="val" id="rpt_pendingTickets">0</td></tr>
+        <tr><td class="lbl" data-i18n="lblOpenWeighted">OPEN VALUE (WEIGHTED):</td><td class="val" id="rpt_openWeighted">0.00</td></tr>
+        <tr><td class="lbl" data-i18n="lblLoserTickets">LOSER TICKETS:</td><td class="val" id="rpt_loser">0</td></tr>
+        <tr><td class="lbl" data-i18n="lblWinnerTickets">WINNER TICKETS:</td><td class="val" id="rpt_winner">0</td></tr>
+        <tr><td class="lbl" data-i18n="lblResultsPending">RESULTS PENDING:</td><td class="val" id="rpt_pendingResults">0</td></tr>
+        <tr><td class="lbl" data-i18n="lblTotalTickets">TOTAL TICKETS:</td><td class="val" id="rpt_totalTickets">0</td></tr>
+        <tr class="row-gray"><td class="lbl" data-i18n="lblTotalSales">TOTAL SALES:</td><td class="val strong" id="rpt_totalSales">0.00</td></tr>
+        <tr><td class="lbl" data-i18n="lblTotalPrizes">TOTAL PRIZES:</td><td class="val" id="rpt_totalPrizes">0.00</td></tr>
+        <tr class="row-gray"><td class="lbl" data-i18n="lblTotalSalesWeb">TOTAL SALES WEB:</td><td class="val strong" id="rpt_totalSalesWeb">0.00</td></tr>
+        <tr><td class="lbl" data-i18n="lblPrizesWeb">PRIZES WEB:</td><td class="val" id="rpt_prizesWeb">0.00</td></tr>
+        <tr><td class="lbl" data-i18n="lblCommission">COMMISSION (%):</td><td class="val" id="rpt_comm">0.00</td></tr>
+        <tr><td class="lbl" data-i18n="lblCommissionWeb">COMMISSION WEB (%):</td><td class="val" id="rpt_commWeb">0.00</td></tr>
+        <tr><td class="lbl" data-i18n="lblDiscount">DISCOUNT:</td><td class="val" id="rpt_discount">0.00</td></tr>
+        <tr class="row-gray"><td class="lbl" data-i18n="lblProfits">PROFITS:</td><td class="val profit" id="rpt_profits">0.00</td></tr>
       </tbody></table>
       <div class="table-scroll"><table class="results-table"><thead>
-        <tr class="results-title"><td colspan="4">Winner Tickets</td></tr>
-        <tr class="results-cols"><td style="width:25%">SN</td><td style="width:25%">BET</td><td style="width:25%">PRIZE</td><td style="width:25%">STATUS</td></tr>
-      </thead><tbody id="rpt_winnerBody"><tr><td colspan="4" class="no-records">No records were found.</td></tr></tbody></table></div>
+        <tr class="results-title"><td colspan="4" data-i18n="winnerTicketsTitle">Winner Tickets</td></tr>
+        <tr class="results-cols"><td style="width:25%" data-i18n="colSN">SN</td><td style="width:25%" data-i18n="colBet">BET</td><td style="width:25%" data-i18n="colPrize">PRIZE</td><td style="width:25%" data-i18n="colStatus">STATUS</td></tr>
+      </thead><tbody id="rpt_winnerBody"><tr><td colspan="4" class="no-records" data-i18n="noRecords">No records were found.</td></tr></tbody></table></div>
     </div>
     <div class="modal-foot">
-      <button type="button" class="btn btn-warn" data-print="salesModal"><i class="fas fa-print"></i> Print</button>
-      <button type="button" class="btn btn-success" data-close="salesModal">Close</button>
+      <button type="button" class="btn btn-warn" data-print="salesModal"><i class="fas fa-print"></i> <span data-i18n="print">Print</span></button>
+      <button type="button" class="btn btn-success" data-close="salesModal" data-i18n="close">Close</button>
     </div>
   </div>
 </div>
@@ -469,24 +560,24 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
 <div class="modal" id="resultsModal" role="dialog" aria-modal="true">
   <div class="modal-backdrop" data-close="resultsModal"></div>
   <div class="modal-card lg">
-    <div class="modal-head"><h4>Lottery Results <span style="font-size:9px;color:#6b7c95;font-weight:800;">· ET</span></h4></div>
+    <div class="modal-head"><h4><span data-i18n="lotteryResults">Lottery Results</span> <span style="font-size:9px;color:#6b7c95;font-weight:800;">· ET</span></h4></div>
     <div class="results-toolbar">
       <input type="date" id="results_date">
-      <button type="button" id="btn_results_search">SEARCH</button>
+      <button type="button" id="btn_results_search" data-i18n="search">SEARCH</button>
       <button type="button" id="btn_sync_ny" class="sync-btn" title="Sync NY Lottery Results"><i class="fas fa-sync"></i></button>
     </div>
     <div id="syncStatus" class="sync-status" style="display:none;"></div>
     <div class="modal-body">
       <div class="table-scroll">
         <table class="results-table" id="tbl_res_1">
-          <thead><tr class="results-cols"><td>LOTTERY</td><td>1RA</td><td>2DA</td><td>3RA</td><td>PALÉ</td><td>PICK3</td><td>PICK4</td></tr></thead>
-          <tbody id="tbl_res_body"><tr><td colspan="7" class="no-records">No results found.</td></tr></tbody>
+          <thead><tr class="results-cols"><td data-i18n="colLottery">LOTTERY</td><td data-i18n="col1ra">1RA</td><td data-i18n="col2da">2DA</td><td data-i18n="col3ra">3RA</td><td data-i18n="colPale">PALÉ</td><td data-i18n="colPick3">PICK3</td><td data-i18n="colPick4">PICK4</td></tr></thead>
+          <tbody id="tbl_res_body"><tr><td colspan="7" class="no-records" data-i18n="noResults">No results found.</td></tr></tbody>
         </table>
       </div>
     </div>
     <div class="modal-foot">
-      <button type="button" class="btn btn-warn" data-print="resultsModal"><i class="fas fa-print"></i> Print</button>
-      <button type="button" class="btn btn-success" data-close="resultsModal">Close</button>
+      <button type="button" class="btn btn-warn" data-print="resultsModal"><i class="fas fa-print"></i> <span data-i18n="print">Print</span></button>
+      <button type="button" class="btn btn-success" data-close="resultsModal" data-i18n="close">Close</button>
     </div>
   </div>
 </div>
@@ -494,14 +585,14 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
 <div class="modal" id="ticketPayModal" role="dialog" aria-modal="true">
   <div class="modal-backdrop" data-close="ticketPayModal"></div>
   <div class="modal-card">
-    <div class="modal-head"><h4>Ticket Payment</h4></div>
+    <div class="modal-head"><h4 data-i18n="ticketPaymentTitle">Ticket Payment</h4></div>
     <div class="modal-body"><div class="ticket-pay-body">
-      <p class="ticket-pay-prompt">Enter the ticket payment code</p>
+      <p class="ticket-pay-prompt" data-i18n="ticketPayPrompt">Enter the ticket payment code</p>
       <input type="text" id="ticketPagar" class="ticket-pay-input" placeholder="T4K2B0007" autocomplete="off" spellcheck="false" autocapitalize="characters">
-      <button type="button" id="pagarTicektBtn" class="ticket-pay-btn"><i class="fas fa-search"></i> PAY</button>
+      <button type="button" id="pagarTicektBtn" class="ticket-pay-btn"><i class="fas fa-search"></i> <span data-i18n="pay">PAY</span></button>
       <div id="searchResult" style="display:none;"></div>
     </div></div>
-    <div class="modal-foot"><button type="button" class="btn btn-warn" data-close="ticketPayModal">Close</button></div>
+    <div class="modal-foot"><button type="button" class="btn btn-warn" data-close="ticketPayModal" data-i18n="close">Close</button></div>
   </div>
 </div>
 
@@ -509,53 +600,53 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
   <div class="modal-backdrop" data-close="ticketsOptionsModal"></div>
   <div class="modal-card">
     <div class="modal-head col">
-      <h4>Tickets Options</h4><div class="divider"></div>
-      <div class="ticket-options-label">Select one ticket</div>
+      <h4 data-i18n="ticketsOptionsTitle">Tickets Options</h4><div class="divider"></div>
+      <div class="ticket-options-label" data-i18n="selectOneTicket">Select one ticket</div>
       <select id="ticketSelect" class="ticket-select"></select>
       <div class="ticket-options-actions">
-        <button type="button" id="btnTicketPrint" class="btn-small" title="Print copy"><i class="fas fa-print"></i><span>Print</span></button>
-        <button type="button" id="btnTicketShow" class="btn-small" title="Show ticket"><i class="fas fa-eye"></i><span>Show</span></button>
-        <button type="button" id="btnTicketCancel" class="btn-small danger" title="Cancel ticket"><i class="fas fa-ban"></i><span id="btnTicketCancelLabel">Cancel</span></button>
+        <button type="button" id="btnTicketPrint" class="btn-small" title="Print copy"><i class="fas fa-print"></i><span data-i18n="print">Print</span></button>
+        <button type="button" id="btnTicketShow" class="btn-small" title="Show ticket"><i class="fas fa-eye"></i><span data-i18n="ticketShow">Show</span></button>
+        <button type="button" id="btnTicketCancel" class="btn-small danger" title="Cancel ticket"><i class="fas fa-ban"></i><span id="btnTicketCancelLabel" data-i18n="cancel">Cancel</span></button>
       </div>
       <div id="cancelCooldownNote" class="cooldown-note" style="display:none;"></div>
     </div>
     <div class="modal-body"><div id="ticketOptionsPreview" class="ticket-options-preview" style="display:none;"></div></div>
-    <div class="modal-foot"><button type="button" class="btn btn-success" data-close="ticketsOptionsModal">Close</button></div>
+    <div class="modal-foot"><button type="button" class="btn btn-success" data-close="ticketsOptionsModal" data-i18n="close">Close</button></div>
   </div>
 </div>
 
 <div class="modal" id="confirmCancelModal" role="dialog" aria-modal="true">
   <div class="modal-backdrop" data-close="confirmCancelModal"></div>
   <div class="modal-card" style="max-width:400px">
-    <div class="modal-head"><h4 style="color:var(--red)">Confirm Cancel</h4></div>
+    <div class="modal-head"><h4 style="color:var(--red)" data-i18n="confirmCancelTitle">Confirm Cancel</h4></div>
     <div class="modal-body" style="padding:24px 20px;text-align:center;font-size:14px;line-height:1.5">
-      Are you sure you want to cancel ticket <br><strong id="confirmCancelCode" style="font-size:18px;color:var(--yellow);margin:8px 0;display:inline-block"></strong>?<br>
-      <span style="color:var(--muted-2);font-size:12px;margin-top:10px;display:block">You have <span id="confirmCancelTime" style="font-weight:900;color:var(--green)"></span> left in the window.</span>
+      <span data-i18n="confirmCancelBody">Are you sure you want to cancel ticket</span> <br><strong id="confirmCancelCode" style="font-size:18px;color:var(--yellow);margin:8px 0;display:inline-block"></strong>?<br>
+      <span style="color:var(--muted-2);font-size:12px;margin-top:10px;display:block"><span data-i18n="youHave">You have</span> <span id="confirmCancelTime" style="font-weight:900;color:var(--green)"></span> <span data-i18n="leftInWindow">left in the window.</span></span>
     </div>
     <div class="modal-foot">
-      <button type="button" class="btn btn-warn" data-close="confirmCancelModal">Close</button>
-      <button type="button" class="btn btn-danger" id="btnConfirmCancelAction">Cancel Ticket</button>
+      <button type="button" class="btn btn-warn" data-close="confirmCancelModal" data-i18n="close">Close</button>
+      <button type="button" class="btn btn-danger" id="btnConfirmCancelAction" data-i18n="cancelTicketBtn">Cancel Ticket</button>
     </div>
   </div>
 </div>
 
-<!-- ===== FALLBACK inline monitor modal (used only if popup is blocked) ===== -->
+<!-- ===== FALLBACK inline monitor modal ===== -->
 <div class="modal" id="monitorModal" role="dialog" aria-modal="true">
   <div class="modal-backdrop" data-close="monitorModal"></div>
   <div class="modal-card monitor-card">
     <div class="monitor-head">
-      <div class="monitor-title"><i class="fas fa-tv"></i> LIVE LOTTERY FEED (Fallback)</div>
+      <div class="monitor-title"><i class="fas fa-tv"></i> <span data-i18n="liveLotteryFeedFallback">LIVE LOTTERY FEED (Fallback)</span></div>
       <div class="monitor-clock" id="monitorClock">--:--:--</div>
     </div>
     <div class="monitor-body">
       <table class="monitor-table">
-        <thead><tr><th>LOTTERY</th><th>1RA</th><th>2DA</th><th>3RA</th><th>PICK3 | LOTT03</th><th>PICK4 | LOTT04</th></tr></thead>
+        <thead><tr><th data-i18n="colLottery">LOTTERY</th><th data-i18n="col1ra">1RA</th><th data-i18n="col2da">2DA</th><th data-i18n="col3ra">3RA</th><th data-i18n="colPick3Lott">PICK3 | LOTT03</th><th data-i18n="colPick4Lott">PICK4 | LOTT04</th></tr></thead>
         <tbody id="monitorBody"></tbody>
       </table>
     </div>
     <div class="modal-foot">
-      <button type="button" class="btn btn-warn" data-print="monitorModal"><i class="fas fa-print"></i> Print</button>
-      <button type="button" class="btn btn-success" data-close="monitorModal">Close</button>
+      <button type="button" class="btn btn-warn" data-print="monitorModal"><i class="fas fa-print"></i> <span data-i18n="print">Print</span></button>
+      <button type="button" class="btn btn-success" data-close="monitorModal" data-i18n="close">Close</button>
     </div>
   </div>
 </div>
@@ -567,8 +658,7 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
 <div class="toast" id="toast"></div>
 
 <!-- ============================================================
-     STANDALONE MONITOR TEMPLATE — written into a separate popup
-     window by launchMonitor(). Contains its own styles + script.
+     STANDALONE MONITOR TEMPLATE
      ============================================================ -->
 <template id="monitorTemplate">
 <style>
@@ -618,7 +708,7 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
 </style>
 
 <header class="monitor-header">
-  <div class="monitor-title"><i class="fas fa-tv"></i> LIVE LOTTERY FEED</div>
+  <div class="monitor-title"><i class="fas fa-tv"></i> {{i18n:liveLotteryFeed}}</div>
   <div class="monitor-right">
     <div class="monitor-clock" id="liveClock">--:--:--</div>
     <button class="monitor-close" type="button" onclick="window.close()" title="Close">✕</button>
@@ -629,12 +719,12 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
   <table id="monitorTable">
     <thead>
       <tr>
-        <th>LOTTERY</th>
-        <th>1RA</th>
-        <th>2DA</th>
-        <th>3RA</th>
-        <th>PICK3 | LOTT03</th>
-        <th>PICK4 | LOTT04</th>
+        <th>{{i18n:colLottery}}</th>
+        <th>{{i18n:col1ra}}</th>
+        <th>{{i18n:col2da}}</th>
+        <th>{{i18n:col3ra}}</th>
+        <th>{{i18n:colPick3Lott}}</th>
+        <th>{{i18n:colPick4Lott}}</th>
       </tr>
     </thead>
     <tbody id="tableBody"></tbody>
@@ -647,6 +737,8 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
   var TZ = 'America/New_York';
   var PRE_CLOSE_MS = 5 * 60 * 1000;
   var RESULTS_KEY = 'pick34.results.v1';
+  var L = window.__I18N || {};
+  function t(k){ return L[k] || k; }
 
   var LOTTERIES = [
     { name:'CONNECT AM',       code:'CT-AM',         color:'#22c55e', draw:'13:37' },
@@ -680,25 +772,17 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
 
   function getETTime(){
     var p = _FMT_TIME.formatToParts(new Date());
-    var h = 0, m = 0, s = 0;
-    for (var i = 0; i < p.length; i++) {
-      if (p[i].type === 'hour')   h = parseInt(p[i].value, 10);
-      if (p[i].type === 'minute') m = parseInt(p[i].value, 10);
-      if (p[i].type === 'second') s = parseInt(p[i].value, 10);
-    }
-    return { h: h, m: m, s: s };
+    var h=0,m=0,s=0;
+    for (var i=0;i<p.length;i++){ if(p[i].type==='hour')h=parseInt(p[i].value,10); if(p[i].type==='minute')m=parseInt(p[i].value,10); if(p[i].type==='second')s=parseInt(p[i].value,10); }
+    return { h:h, m:m, s:s };
   }
   function getETDateKey(){
     var p = _FMT_DATE.formatToParts(new Date());
-    var y = '', m = '', d = '';
-    for (var i = 0; i < p.length; i++) {
-      if (p[i].type === 'year')  y = p[i].value;
-      if (p[i].type === 'month') m = p[i].value;
-      if (p[i].type === 'day')   d = p[i].value;
-    }
-    return y + '-' + m + '-' + d;
+    var y='',m='',d='';
+    for (var i=0;i<p.length;i++){ if(p[i].type==='year')y=p[i].value; if(p[i].type==='month')m=p[i].value; if(p[i].type==='day')d=p[i].value; }
+    return y+'-'+m+'-'+d;
   }
-  function pad2(n){ return String(n).padStart(2, '0'); }
+  function pad2(n){ return String(n).padStart(2,'0'); }
 
   function loadResults(){
     try { return JSON.parse(localStorage.getItem(RESULTS_KEY) || '{}'); }
@@ -707,24 +791,19 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
 
   function getCountdownString(drawStr){
     var t = getETTime();
-    var nowSec = t.h * 3600 + t.m * 60 + t.s;
+    var nowSec = t.h*3600 + t.m*60 + t.s;
     var bits = drawStr.split(':');
-    var dh = parseInt(bits[0], 10);
-    var dm = parseInt(bits[1], 10);
-    var drawSec = dh * 3600 + dm * 60;
-    var closeSec = drawSec - (PRE_CLOSE_MS / 1000);
-    if (closeSec < 0) {
-      closeSec += 24 * 3600; drawSec += 24 * 3600;
-      if (nowSec < 12 * 3600) nowSec += 24 * 3600;
-    }
+    var dh = parseInt(bits[0],10), dm = parseInt(bits[1],10);
+    var drawSec = dh*3600 + dm*60;
+    var closeSec = drawSec - (PRE_CLOSE_MS/1000);
+    if (closeSec < 0){ closeSec += 24*3600; drawSec += 24*3600; if(nowSec<12*3600) nowSec+=24*3600; }
     var diffClose = closeSec - nowSec;
-    var diffDraw  = drawSec  - nowSec;
-    if (diffDraw <= 0) return { text: 'DRAWN', cls: 'drawn' };
-    if (diffClose <= 0) return { text: 'CLOSED', cls: 'closed' };
-    var mm = Math.floor(diffClose / 60);
-    var ss = diffClose % 60;
-    var txt = pad2(mm) + ':' + pad2(ss);
-    var cls = diffClose <= 15 * 60 ? 'warning' : 'open';
+    var diffDraw  = drawSec - nowSec;
+    if (diffDraw <= 0) return { text: t('drawn'), cls: 'drawn' };
+    if (diffClose <= 0) return { text: t('closed'), cls: 'closed' };
+    var mm = Math.floor(diffClose/60), ss = diffClose%60;
+    var txt = pad2(mm)+':'+pad2(ss);
+    var cls = diffClose <= 15*60 ? 'warning' : 'open';
     return { text: txt, cls: cls };
   }
 
@@ -738,25 +817,18 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
       var lot = LOTTERIES[i];
       var day = resultsData[todayKey] || {};
       var r = day[lot.name] || {};
-      var r1 = r.r1 || '--';
-      var r2 = r.r2 || '--';
-      var r3 = r.r3 || '--';
-      var p3 = r.pick3 || '---';
-      var p4 = r.pick4 || '----';
+      var r1 = r.r1 || '--', r2 = r.r2 || '--', r3 = r.r3 || '--', p3 = r.pick3 || '---', p4 = r.pick4 || '----';
       var cd = getCountdownString(lot.draw);
-      var e1 = r1 === '--' ? ' empty-result' : '';
-      var e2 = r2 === '--' ? ' empty-result' : '';
-      var e3 = r3 === '--' ? ' empty-result' : '';
-      var eP3 = p3 === '---' ? ' empty-result' : '';
-      var eP4 = p4 === '----' ? ' empty-result' : '';
+      var e1 = r1==='--'?' empty-result':'', e2 = r2==='--'?' empty-result':'', e3 = r3==='--'?' empty-result':'';
+      var eP3 = p3==='---'?' empty-result':'', eP4 = p4==='----'?' empty-result':'';
       html += '<tr>' +
-        '<td><i class="fas fa-star star-icon" style="color:' + lot.color + ';"></i> ' + lot.code +
-        '<span class="monitor-cd ' + cd.cls + '">' + cd.text + '</span></td>' +
-        '<td class="' + e1.trim() + '">' + r1 + '</td>' +
-        '<td class="' + e2.trim() + '">' + r2 + '</td>' +
-        '<td class="' + e3.trim() + '">' + r3 + '</td>' +
-        '<td class="' + eP3.trim() + '">' + p3 + '</td>' +
-        '<td class="' + eP4.trim() + '">' + p4 + '</td>' +
+        '<td><i class="fas fa-star star-icon" style="color:'+lot.color+';"></i> '+lot.code+
+        '<span class="monitor-cd '+cd.cls+'">'+cd.text+'</span></td>' +
+        '<td class="'+e1.trim()+'">'+r1+'</td>' +
+        '<td class="'+e2.trim()+'">'+r2+'</td>' +
+        '<td class="'+e3.trim()+'">'+r3+'</td>' +
+        '<td class="'+eP3.trim()+'">'+p3+'</td>' +
+        '<td class="'+eP4.trim()+'">'+p4+'</td>' +
       '</tr>';
     }
     tbody.innerHTML = html;
@@ -773,9 +845,7 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
     updateClock();
     setInterval(updateClock, 1000);
     setInterval(renderMonitor, 1000);
-    window.addEventListener('storage', function(e){
-      if (!e.key || e.key === RESULTS_KEY) renderMonitor();
-    });
+    window.addEventListener('storage', function(e){ if(!e.key || e.key===RESULTS_KEY) renderMonitor(); });
   }
   init();
 })();
@@ -783,8 +853,7 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
 </template>
 
 <script>
-/* ===== Main POS app (unchanged except monitor handler) ===== */
-/* Entire POS script retained; only the monitor button handler changed. */
+/* ===== Main POS app ===== */
 (function () {
   'use strict';
 
@@ -851,7 +920,7 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
     if(s==='.') return d.length>=2; if(s==='Q'||s==='+') return d.length===4; return true;
   }
 
-  const PHONE_KEY='pick34.phone.v1', TICKETS_KEY='pick34.tickets.v1', OWNER_KEY='pick34.owner.v1', USER_KEY='pick34.user.v1', RESULTS_KEY='pick34.results.v1', TICKET_SEQ_KEY='pick34.ticketseq.v1', SYNC_META_KEY='pick34.syncmeta.v1', CURRENCY_KEY='pick34.currency.v1';
+  const PHONE_KEY='pick34.phone.v1', TICKETS_KEY='pick34.tickets.v1', OWNER_KEY='pick34.owner.v1', USER_KEY='pick34.user.v1', RESULTS_KEY='pick34.results.v1', TICKET_SEQ_KEY='pick34.ticketseq.v1', SYNC_META_KEY='pick34.syncmeta.v1', CURRENCY_KEY='pick34.currency.v1', LANG_KEY='pick34.lang.v1';
 
   function createLocalStore(){
     const metaCache=new Map(); let tickets=[]; let results={}; let backend=null; let backendName='memory'; let writeChain=Promise.resolve();
@@ -861,7 +930,7 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
     function flushTickets(){ if(!backend) return Promise.resolve(); const p=JSON.stringify(tickets); return enqueue(()=>{ try{ backend.setItem(TICKETS_KEY,p); }catch(e){} }); }
     function flushResults(){ if(!backend) return Promise.resolve(); const p=JSON.stringify(results); return enqueue(()=>{ try{ backend.setItem(RESULTS_KEY,p); }catch(e){} }); }
     return {
-      async init(){ chooseBackend(); if(backend){ try{ tickets=JSON.parse(backend.getItem(TICKETS_KEY)||'[]'); }catch(e){ tickets=[]; } try{ results=JSON.parse(backend.getItem(RESULTS_KEY)||'{}'); }catch(e){ results={}; } [PHONE_KEY,OWNER_KEY,USER_KEY,TICKET_SEQ_KEY,SYNC_META_KEY,CURRENCY_KEY].forEach(k=>{ const v=backend.getItem(k); if(v!=null) metaCache.set(k,v); }); } return {backendName}; },
+      async init(){ chooseBackend(); if(backend){ try{ tickets=JSON.parse(backend.getItem(TICKETS_KEY)||'[]'); }catch(e){ tickets=[]; } try{ results=JSON.parse(backend.getItem(RESULTS_KEY)||'{}'); }catch(e){ results={}; } [PHONE_KEY,OWNER_KEY,USER_KEY,TICKET_SEQ_KEY,SYNC_META_KEY,CURRENCY_KEY,LANG_KEY].forEach(k=>{ const v=backend.getItem(k); if(v!=null) metaCache.set(k,v); }); } return {backendName}; },
       getTickets(){ return tickets.slice(); },
       saveTicket(t){ tickets.push(t); return flushTickets(); },
       setTickets(arr){ tickets=arr.slice(); return flushTickets(); },
@@ -876,6 +945,388 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
   const store=createLocalStore();
   const SESSION_SALT=Math.random().toString(36).slice(2,6).toUpperCase();
 
+  /* ===================== I18N ===================== */
+  const LANGS = ['en','es','ht'];
+  const LANG_NAMES = { en:'English', es:'Español', ht:'Kreyòl Ayisyen' };
+  const LANG_SHORT = { en:'EN', es:'ES', ht:'HT' };
+  let currentLang = 'en';
+
+  const I18N = {
+    en: {
+      howToPlay:'HOW TO PLAY', lottery:'Lottery', number:'Number', amount:'Amount',
+      currentTicket:'Current Ticket', catPick2:'PICK 2', catPale:'PALE', catPick3:'PICK 3', catPick4:'PICK 4',
+      colLot:'LOT', colNum:'NUM', colAmt:'AMT', empty:'Empty',
+      pay:'PAY', sales:'SALES', results:'RESULTS', tickets:'TICKETS',
+      howToPlayTitle:'How to Play', quickStart:'Quick Start',
+      qs1:'Select lottery from the chip', qs2:'Enter number + amount',
+      qs3a:'Press', qs3b:'to add bet', qs4a:'Repeat or press', qs4b:'on empty to preview ticket',
+      numberFormats:'Number Formats',
+      fmtStraight:'Straight', fmtStraightDesc:'Exact match wins',
+      fmtBox:'Box', fmtBoxDesc:'Any order',
+      fmtPale:'Pale', fmtPaleDesc:'First 2 + Last 2',
+      fmtCombo:'Combo', fmtComboDesc:'12x34 permutations',
+      fmtWildcard:'Wildcard', fmtWildcardDesc:'X matches any digit',
+      payouts:'Payouts', payPick2:'$65 straight',
+      payPick3:'$650 straight · $80 box3 · $100 box6',
+      payPick4:'$4,000 straight · $400 box4 · $250 box6 · $150 box12 · $100 box24',
+      payPale:'$800', payPairsLabel:'PAIRS', payPairs:'2d $6.5 · 3d $65/$15 · 4d $15/$10/$5',
+      ticketAndPayment:'Ticket & Payment',
+      tp1a:'Preview ticket: press', tp1b:'with empty fields',
+      tp2:'Print or send via WhatsApp', tp3:'Pay button: enter ticket code to mark paid',
+      tp4:'Cancel window: 1 minute after sale',
+      selectLotteries:'Select Lotteries', close:'Close', cancel:'Cancel',
+      whatsapp:'WHATSAPP', sellerWhatsapp:'SELLER WHATSAPP',
+      sendViaWhatsApp:'Send via WhatsApp', printTicket:'Print Ticket',
+      ticketPreview:'Ticket Preview', ticketCancelled:'Ticket Cancelled',
+      cancelledNotice:'This ticket has been cancelled. Print or send a copy to the seller for their records.',
+      sendCopyToSeller:'Send Copy to Seller', printCopy:'Print Copy',
+      salesReport:'Sales Report', to:'to', search:'SEARCH', print:'Print', salesSummary:'Sales Summary',
+      lblOwner:'OWNER:', lblUsername:'USERNAME:', lblPendingPayment:'PENDING PAYMENT:',
+      lblPendingTickets:'PENDING TICKETS:', lblOpenWeighted:'OPEN VALUE (WEIGHTED):',
+      lblLoserTickets:'LOSER TICKETS:', lblWinnerTickets:'WINNER TICKETS:',
+      lblResultsPending:'RESULTS PENDING:', lblTotalTickets:'TOTAL TICKETS:',
+      lblTotalSales:'TOTAL SALES:', lblTotalPrizes:'TOTAL PRIZES:',
+      lblTotalSalesWeb:'TOTAL SALES WEB:', lblPrizesWeb:'PRIZES WEB:',
+      lblCommission:'COMMISSION (%):', lblCommissionWeb:'COMMISSION WEB (%):',
+      lblDiscount:'DISCOUNT:', lblProfits:'PROFITS:',
+      winnerTicketsTitle:'Winner Tickets', colSN:'SN', colBet:'BET', colPrize:'PRIZE', colStatus:'STATUS',
+      noRecords:'No records were found.', lotteryResults:'Lottery Results',
+      colLottery:'LOTTERY', col1ra:'1RA', col2da:'2DA', col3ra:'3RA', colPale:'PALÉ', colPick3:'PICK3', colPick4:'PICK4',
+      noResults:'No results found.',
+      ticketPaymentTitle:'Ticket Payment', ticketPayPrompt:'Enter the ticket payment code',
+      ticketsOptionsTitle:'Tickets Options', selectOneTicket:'Select one ticket',
+      ticketShow:'Show', confirmCancelTitle:'Confirm Cancel',
+      confirmCancelBody:'Are you sure you want to cancel ticket',
+      youHave:'You have', leftInWindow:'left in the window.',
+      cancelTicketBtn:'Cancel Ticket',
+      liveLotteryFeedFallback:'LIVE LOTTERY FEED (Fallback)', liveLotteryFeed:'LIVE LOTTERY FEED',
+      colPick3Lott:'PICK3 | LOTT03', colPick4Lott:'PICK4 | LOTT04',
+      drawn:'DRAWN', closed:'CLOSED',
+      maxWinShort:'win', openShort:'OPEN',
+      // Toasts
+      toastLang:'Language: {l}',
+      toastCurrency:'Currency set to {c}',
+      toastNoBetsPreview:'No bets to preview', toastEnterNumber:'Enter a number',
+      toastEnterAmount:'Enter amount', toastInvalidNumber:'Invalid number',
+      toastMergedExisting:'Merged with existing bets', toastSomeMerged:'Some bets merged',
+      toastSelectLottery:'Select at least one lottery',
+      toastAddedLotteries:'Added to {n} lotteries',
+      toastClosedSwitched:'{names} closed — switched',
+      toastLotteryClosed:'{name} is closed',
+      toastInvalidPlay:'Invalid for Play rules',
+      toastEnterValidPhone:'Enter a valid WhatsApp number',
+      toastOpeningWhatsApp:'Opening WhatsApp…',
+      toastNoBetsToSend:'No bets to send', toastNoBetsToPrint:'No bets to print',
+      toastTicketPrinted:'Ticket printed — cancel window started',
+      toastStorageSession:'Tab-only storage — data lost if tab closes',
+      toastStorageNone:'Storage unavailable — data will not persist',
+      toastPopupBlocked:'Popup blocked — opening inline monitor',
+      toastTicketNotFound:'Ticket not found', toastTicketPaid:'Ticket paid',
+      toastTicketVoided:'Ticket voided', toastTicketCancelled:'Ticket cancelled',
+      toastCouldNotCancel:'Could not cancel ticket', toastCouldNotSave:'Could not save ticket',
+      toastCouldNotUpdate:'Could not update ticket', toastCouldNotPay:'Could not save payment',
+      toastCouldNotVoid:'Could not void ticket', toastEnterCode:'Enter a ticket code',
+      toastCannotVoidPaid:'Cannot void a paid ticket', toastAlreadyVoid:'Already void',
+      toastAlreadyPaid:'Already paid', toastTicketIsCancelled:'Ticket is cancelled',
+      toastTicketIsVoid:'Ticket is void', toastPickDate:'Pick a date',
+      toastPickDateRange:'Pick a date range', toastStartAfterEnd:'Start date is after end date',
+      toastNoTicketSelected:'No ticket selected', toastPaidCannotCancel:'Paid tickets cannot be cancelled',
+      toastAlreadyCancelled:'Ticket already cancelled', toastWindowExpired:'Cancel window expired (1 min)',
+      toastCancelExpired:'Cancel window expired', toastCancelPaid:'Paid tickets cannot be cancelled',
+      toastFetchNY:'Fetching NY Lottery results…', toastNYUpdated:'NY results updated',
+      toastNYFailed:'NY sync failed: {r}',
+      // Ticket receipt
+      rcptPost:'POST # 01', rcptTicket:'TICKET #', rcptSerie:'SERIE:', rcptCollect:'COLLECT:',
+      rcptNo:'NO.', rcptAmount:'AMOUNT', rcptTotal:'TOTAL:', rcptMaxWin:'MAX WIN:',
+      rcptCancelled:'*** CANCELLED ***',
+      rcptDisclaimer:"YOUR TICKET. WE DON'T PAY<br>DOUBLE PALE. NO TICKET NO<br>MONEY.",
+      rcptDisclaimerText:"YOUR TICKET. WE DON'T PAY\nDOUBLE PALE. NO TICKET NO\nMONEY.\n",
+      // Status labels
+      stPending:'PENDING', stPaid:'PAID', stVoid:'VOID', stCancelled:'CANCELLED',
+      stWinner:'WINNER', stLoser:'LOSER',
+      // Cooldown
+      cdLockedPaid:'Paid tickets cannot be cancelled.',
+      cdTicketCancelled:'Ticket is cancelled.',
+      cdLeftToCancel:'<b>{t}</b> left to cancel<br><span style="opacity:.75;font-size:9px;">Window closes 1 min after sale</span>',
+      cdWindowExpired:'Cancel window expired<br><span style="opacity:.75;font-size:9px;">1-minute window after sale</span>',
+      cdLocked:'Locked',
+      // Group totals / misc
+      groupTotals:'{stake} · {win}',
+      maxWinLabel:'MAX WIN', staked:'STAKED', confirmPaymentBtn:'CONFIRM PAYMENT',
+      voidBtn:'VOID', noTicketsYet:'No tickets yet.',
+      selectTicketPreview:'Select a ticket to preview.',
+      statusWinnerPrize:'WINNER ({p})',
+      ticketSentMeta:'Sent: {d}',
+      winnerPrizeNote:'🎉 WINNER! Prize: {p}',
+      paidOn:'✓ Paid on {d}', voidedOn:'✕ Voided on {d}', cancelledOn:'✕ CANCELLED on {d}'
+    },
+    es: {
+      howToPlay:'CÓMO JUGAR', lottery:'Lotería', number:'Número', amount:'Monto',
+      currentTicket:'Ticket Actual', catPick2:'PICK 2', catPale:'PALE', catPick3:'PICK 3', catPick4:'PICK 4',
+      colLot:'LOT', colNum:'NÚM', colAmt:'MON', empty:'Vacío',
+      pay:'PAGAR', sales:'VENTAS', results:'RESULTADOS', tickets:'TICKETS',
+      howToPlayTitle:'Cómo Jugar', quickStart:'Inicio Rápido',
+      qs1:'Seleccione lotería en la ficha', qs2:'Ingrese número + monto',
+      qs3a:'Presione', qs3b:'para agregar apuesta', qs4a:'Repita o presione', qs4b:'vacío para ver ticket',
+      numberFormats:'Formatos de Número',
+      fmtStraight:'Directo', fmtStraightDesc:'Coincidencia exacta gana',
+      fmtBox:'Caja', fmtBoxDesc:'Cualquier orden',
+      fmtPale:'Palé', fmtPaleDesc:'Primeros 2 + Últimos 2',
+      fmtCombo:'Combo', fmtComboDesc:'12x34 permutaciones',
+      fmtWildcard:'Comodín', fmtWildcardDesc:'X coincide con cualquier dígito',
+      payouts:'Pagos', payPick2:'$65 directo',
+      payPick3:'$650 directo · $80 caja3 · $100 caja6',
+      payPick4:'$4,000 directo · $400 caja4 · $250 caja6 · $150 caja12 · $100 caja24',
+      payPale:'$800', payPairsLabel:'PARES', payPairs:'2d $6.5 · 3d $65/$15 · 4d $15/$10/$5',
+      ticketAndPayment:'Ticket y Pago',
+      tp1a:'Vista previa del ticket: presione', tp1b:'con campos vacíos',
+      tp2:'Imprimir o enviar por WhatsApp', tp3:'Botón Pagar: ingrese código del ticket para marcar pagado',
+      tp4:'Ventana de cancelación: 1 minuto tras la venta',
+      selectLotteries:'Seleccionar Loterías', close:'Cerrar', cancel:'Cancelar',
+      whatsapp:'WHATSAPP', sellerWhatsapp:'WHATSAPP DEL VENDEDOR',
+      sendViaWhatsApp:'Enviar por WhatsApp', printTicket:'Imprimir Ticket',
+      ticketPreview:'Vista Previa del Ticket', ticketCancelled:'Ticket Cancelado',
+      cancelledNotice:'Este ticket ha sido cancelado. Imprima o envíe una copia al vendedor para sus registros.',
+      sendCopyToSeller:'Enviar Copia al Vendedor', printCopy:'Imprimir Copia',
+      salesReport:'Reporte de Ventas', to:'a', search:'BUSCAR', print:'Imprimir', salesSummary:'Resumen de Ventas',
+      lblOwner:'DUEÑO:', lblUsername:'USUARIO:', lblPendingPayment:'PAGO PENDIENTE:',
+      lblPendingTickets:'TICKETS PENDIENTES:', lblOpenWeighted:'VALOR ABIERTO (PONDERADO):',
+      lblLoserTickets:'TICKETS PERDEDORES:', lblWinnerTickets:'TICKETS GANADORES:',
+      lblResultsPending:'RESULTADOS PENDIENTES:', lblTotalTickets:'TOTAL TICKETS:',
+      lblTotalSales:'VENTAS TOTALES:', lblTotalPrizes:'PREMIOS TOTALES:',
+      lblTotalSalesWeb:'VENTAS WEB TOTALES:', lblPrizesWeb:'PREMIOS WEB:',
+      lblCommission:'COMISIÓN (%):', lblCommissionWeb:'COMISIÓN WEB (%):',
+      lblDiscount:'DESCUENTO:', lblProfits:'GANANCIAS:',
+      winnerTicketsTitle:'Tickets Ganadores', colSN:'SN', colBet:'APUESTA', colPrize:'PREMIO', colStatus:'ESTADO',
+      noRecords:'No se encontraron registros.', lotteryResults:'Resultados de Lotería',
+      colLottery:'LOTERÍA', col1ra:'1RA', col2da:'2DA', col3ra:'3RA', colPale:'PALÉ', colPick3:'PICK3', colPick4:'PICK4',
+      noResults:'Sin resultados.',
+      ticketPaymentTitle:'Pago de Ticket', ticketPayPrompt:'Ingrese el código de pago del ticket',
+      ticketsOptionsTitle:'Opciones de Tickets', selectOneTicket:'Seleccione un ticket',
+      ticketShow:'Ver', confirmCancelTitle:'Confirmar Cancelación',
+      confirmCancelBody:'¿Está seguro que desea cancelar el ticket',
+      youHave:'Tiene', leftInWindow:'restantes en la ventana.',
+      cancelTicketBtn:'Cancelar Ticket',
+      liveLotteryFeedFallback:'FEED DE LOTERÍA EN VIVO (Respaldo)', liveLotteryFeed:'FEED DE LOTERÍA EN VIVO',
+      colPick3Lott:'PICK3 | LOTT03', colPick4Lott:'PICK4 | LOTT04',
+      drawn:'SORTEADO', closed:'CERRADO',
+      maxWinShort:'gana', openShort:'ABIERTO',
+      toastLang:'Idioma: {l}',
+      toastCurrency:'Moneda cambiada a {c}',
+      toastNoBetsPreview:'No hay apuestas para previsualizar', toastEnterNumber:'Ingrese un número',
+      toastEnterAmount:'Ingrese monto', toastInvalidNumber:'Número inválido',
+      toastMergedExisting:'Fusionado con apuestas existentes', toastSomeMerged:'Algunas apuestas fusionadas',
+      toastSelectLottery:'Seleccione al menos una lotería',
+      toastAddedLotteries:'Agregado a {n} loterías',
+      toastClosedSwitched:'{names} cerradas — cambiado',
+      toastLotteryClosed:'{name} está cerrada',
+      toastInvalidPlay:'Inválido para reglas de juego',
+      toastEnterValidPhone:'Ingrese un número de WhatsApp válido',
+      toastOpeningWhatsApp:'Abriendo WhatsApp…',
+      toastNoBetsToSend:'No hay apuestas para enviar', toastNoBetsToPrint:'No hay apuestas para imprimir',
+      toastTicketPrinted:'Ticket impreso — ventana de cancelación iniciada',
+      toastStorageSession:'Almacenamiento solo de pestaña — datos se pierden al cerrar',
+      toastStorageNone:'Almacenamiento no disponible — datos no persistirán',
+      toastPopupBlocked:'Ventana emergente bloqueada — abriendo monitor en línea',
+      toastTicketNotFound:'Ticket no encontrado', toastTicketPaid:'Ticket pagado',
+      toastTicketVoided:'Ticket anulado', toastTicketCancelled:'Ticket cancelado',
+      toastCouldNotCancel:'No se pudo cancelar el ticket', toastCouldNotSave:'No se pudo guardar el ticket',
+      toastCouldNotUpdate:'No se pudo actualizar el ticket', toastCouldNotPay:'No se pudo guardar el pago',
+      toastCouldNotVoid:'No se pudo anular el ticket', toastEnterCode:'Ingrese código del ticket',
+      toastCannotVoidPaid:'No se puede anular un ticket pagado', toastAlreadyVoid:'Ya anulado',
+      toastAlreadyPaid:'Ya pagado', toastTicketIsCancelled:'El ticket está cancelado',
+      toastTicketIsVoid:'El ticket está anulado', toastPickDate:'Seleccione una fecha',
+      toastPickDateRange:'Seleccione un rango de fechas', toastStartAfterEnd:'Fecha inicial es posterior a la final',
+      toastNoTicketSelected:'No hay ticket seleccionado', toastPaidCannotCancel:'Tickets pagados no se pueden cancelar',
+      toastAlreadyCancelled:'Ticket ya cancelado', toastWindowExpired:'Ventana de cancelación expirada (1 min)',
+      toastCancelExpired:'Ventana de cancelación expirada', toastCancelPaid:'Tickets pagados no se pueden cancelar',
+      toastFetchNY:'Obteniendo resultados de Lotería de NY…', toastNYUpdated:'Resultados de NY actualizados',
+      toastNYFailed:'Fallo de sincronización NY: {r}',
+      rcptPost:'POST # 01', rcptTicket:'TICKET #', rcptSerie:'SERIE:', rcptCollect:'COBRAR:',
+      rcptNo:'NO.', rcptAmount:'MONTO', rcptTotal:'TOTAL:', rcptMaxWin:'GANANCIA MAX:',
+      rcptCancelled:'*** CANCELADO ***',
+      rcptDisclaimer:"SU BOLETO. NO PAGAMOS<br>PALE DOBLE. SIN BOLETO NO<br>HAY DINERO.",
+      rcptDisclaimerText:"SU BOLETO. NO PAGAMOS\nPALE DOBLE. SIN BOLETO NO\nHAY DINERO.\n",
+      stPending:'PENDIENTE', stPaid:'PAGADO', stVoid:'ANULADO', stCancelled:'CANCELADO',
+      stWinner:'GANADOR', stLoser:'PERDEDOR',
+      cdLockedPaid:'Los tickets pagados no se pueden cancelar.',
+      cdTicketCancelled:'El ticket está cancelado.',
+      cdLeftToCancel:'<b>{t}</b> restantes para cancelar<br><span style="opacity:.75;font-size:9px;">La ventana cierra 1 min tras la venta</span>',
+      cdWindowExpired:'Ventana de cancelación expirada<br><span style="opacity:.75;font-size:9px;">Ventana de 1 minuto tras la venta</span>',
+      cdLocked:'Bloqueado',
+      groupTotals:'{stake} · {win}',
+      maxWinLabel:'GANANCIA MAX', staked:'APOSTADO', confirmPaymentBtn:'CONFIRMAR PAGO',
+      voidBtn:'ANULAR', noTicketsYet:'Aún no hay tickets.',
+      selectTicketPreview:'Seleccione un ticket para previsualizar.',
+      statusWinnerPrize:'GANADOR ({p})',
+      ticketSentMeta:'Enviado: {d}',
+      winnerPrizeNote:'🎉 ¡GANADOR! Premio: {p}',
+      paidOn:'✓ Pagado el {d}', voidedOn:'✕ Anulado el {d}', cancelledOn:'✕ CANCELADO el {d}'
+    },
+    ht: {
+      howToPlay:'KOMAN JWE', lottery:'Lotri', number:'Nimewo', amount:'Montan',
+      currentTicket:'Ticket Aktyèl', catPick2:'PICK 2', catPale:'PALE', catPick3:'PICK 3', catPick4:'PICK 4',
+      colLot:'LOT', colNum:'NIM', colAmt:'MONT', empty:'Vid',
+      pay:'PEYE', sales:'VANT', results:'REZILTA', tickets:'TIKÈ',
+      howToPlayTitle:'Koman Jwe', quickStart:'Kòmanse Rapid',
+      qs1:'Chwazi lotri nan chip la', qs2:'Antre nimewo + montan',
+      qs3a:'Peze', qs3b:'pou ajoute paryaj', qs4a:'Repete oswa peze', qs4b:'vid pou wè tikè',
+      numberFormats:'Fòma Nimewo',
+      fmtStraight:'Dirèk', fmtStraightDesc:'Matche egzak genyen',
+      fmtBox:'Bwat', fmtBoxDesc:'Nenpòt lòd',
+      fmtPale:'Pale', fmtPaleDesc:'2 premye + 2 dènye',
+      fmtCombo:'Konbo', fmtComboDesc:'12x34 pèmitasyon',
+      fmtWildcard:'Joker', fmtWildcardDesc:'X matche ak nenpòt chif',
+      payouts:'Peman', payPick2:'$65 dirèk',
+      payPick3:'$650 dirèk · $80 bwat3 · $100 bwat6',
+      payPick4:'$4,000 dirèk · $400 bwat4 · $250 bwat6 · $150 bwat12 · $100 bwat24',
+      payPale:'$800', payPairsLabel:'PÈ', payPairs:'2d $6.5 · 3d $65/$15 · 4d $15/$10/$5',
+      ticketAndPayment:'Tikè ak Peman',
+      tp1a:'Apèsi tikè: peze', tp1b:'ak chan vid',
+      tp2:'Enprime oswa voye pa WhatsApp', tp3:'Bouton Peye: antre kòd tikè pou make peye',
+      tp4:'Fenèt anilasyon: 1 minit apre vant',
+      selectLotteries:'Chwazi Lotri', close:'Fèmen', cancel:'Anile',
+      whatsapp:'WHATSAPP', sellerWhatsapp:'WHATSAPP VANDÈ',
+      sendViaWhatsApp:'Voye pa WhatsApp', printTicket:'Enprime Tikè',
+      ticketPreview:'Apèsi Tikè', ticketCancelled:'Tikè Anile',
+      cancelledNotice:'Tikè sa a anile. Enprime oswa voye yon kopi bay vandè a pou dosye li.',
+      sendCopyToSeller:'Voye Kopi bay Vandè', printCopy:'Enprime Kopi',
+      salesReport:'Rapò Vant', to:'a', search:'CHÈCHE', print:'Enprime', salesSummary:'Rezime Vant',
+      lblOwner:'PWOPRIYETÈ:', lblUsername:'ITILIZATÈ:', lblPendingPayment:'PEMAN AN ATANT:',
+      lblPendingTickets:'TIKÈ AN ATANT:', lblOpenWeighted:'VALÈ OUVÈT (PONDE):',
+      lblLoserTickets:'TIKÈ PÈDAN:', lblWinnerTickets:'TIKÈ GAYAN:',
+      lblResultsPending:'REZILTA AN ATANT:', lblTotalTickets:'TOTAL TIKÈ:',
+      lblTotalSales:'TOTAL VANT:', lblTotalPrizes:'TOTAL PRI:',
+      lblTotalSalesWeb:'TOTAL VANT WEB:', lblPrizesWeb:'PRI WEB:',
+      lblCommission:'KOMISYON (%):', lblCommissionWeb:'KOMISYON WEB (%):',
+      lblDiscount:'DISKONT:', lblProfits:'PWOFI:',
+      winnerTicketsTitle:'Tikè Gayan', colSN:'SN', colBet:'PARYAJ', colPrize:'PRI', colStatus:'ESTATI',
+      noRecords:'Pa gen dosye.', lotteryResults:'Rezilta Lotri',
+      colLottery:'LOTRI', col1ra:'1RA', col2da:'2DA', col3ra:'3RA', colPale:'PALÉ', colPick3:'PICK3', colPick4:'PICK4',
+      noResults:'Pa gen rezilta.',
+      ticketPaymentTitle:'Peman Tikè', ticketPayPrompt:'Antre kòd peman tikè a',
+      ticketsOptionsTitle:'Opsyon Tikè', selectOneTicket:'Chwazi yon tikè',
+      ticketShow:'Wè', confirmCancelTitle:'Konfime Anilasyon',
+      confirmCancelBody:'Ou sèten ou vle anile tikè',
+      youHave:'Ou gen', leftInWindow:'ki rete nan fenèt la.',
+      cancelTicketBtn:'Anile Tikè',
+      liveLotteryFeedFallback:'FLIKS LOTRI AN DIRÈK (Rèl)', liveLotteryFeed:'FLIKS LOTRI AN DIRÈK',
+      colPick3Lott:'PICK3 | LOTT03', colPick4Lott:'PICK4 | LOTT04',
+      drawn:'TIRAJE', closed:'FÈMEN',
+      maxWinShort:'genyen', openShort:'OUVÈ',
+      toastLang:'Lang: {l}',
+      toastCurrency:'Monnen chanje a {c}',
+      toastNoBetsPreview:'Pa gen paryaj pou wè', toastEnterNumber:'Antre yon nimewo',
+      toastEnterAmount:'Antre montan', toastInvalidNumber:'Nimewo pa valid',
+      toastMergedExisting:'Fizyone ak paryaj ki egziste', toastSomeMerged:'Kèk paryaj fizyone',
+      toastSelectLottery:'Chwazi omwen yon lotri',
+      toastAddedLotteries:'Ajoute nan {n} lotri',
+      toastClosedSwitched:'{names} fèmen — chanje',
+      toastLotteryClosed:'{name} fèmen',
+      toastInvalidPlay:'Pa valid pou règ jwèt',
+      toastEnterValidPhone:'Antre yon nimewo WhatsApp valid',
+      toastOpeningWhatsApp:'Louvri WhatsApp…',
+      toastNoBetsToSend:'Pa gen paryaj pou voye', toastNoBetsToPrint:'Pa gen paryaj pou enprime',
+      toastTicketPrinted:'Tikè enprime — fenèt anilasyon kòmanse',
+      toastStorageSession:'Depo sèlman tab — done pèdi si tab fèmen',
+      toastStorageNone:'Depo pa disponib — done pa ap pèsiste',
+      toastPopupBlocked:'Popòp bloke — louvri monitè an liy',
+      toastTicketNotFound:'Tikè pa jwenn', toastTicketPaid:'Tikè peye',
+      toastTicketVoided:'Tikè anile', toastTicketCancelled:'Tikè anile',
+      toastCouldNotCancel:'Pa t kapab anile tikè', toastCouldNotSave:'Pa t kapab sove tikè',
+      toastCouldNotUpdate:'Pa t kapab mete tikè ajou', toastCouldNotPay:'Pa t kapab sove peman',
+      toastCouldNotVoid:'Pa t kapab anile tikè', toastEnterCode:'Antre kòd tikè',
+      toastCannotVoidPaid:'Pa ka anile yon tikè ki peye', toastAlreadyVoid:'Deja anile',
+      toastAlreadyPaid:'Deja peye', toastTicketIsCancelled:'Tikè a anile',
+      toastTicketIsVoid:'Tikè a anile', toastPickDate:'Chwazi yon dat',
+      toastPickDateRange:'Chwazi yon ranje dat', toastStartAfterEnd:'Dat kòmansman apre dat fen',
+      toastNoTicketSelected:'Pa gen tikè chwazi', toastPaidCannotCancel:'Tikè peye pa ka anile',
+      toastAlreadyCancelled:'Tikè deja anile', toastWindowExpired:'Fenèt anilasyon ekspire (1 min)',
+      toastCancelExpired:'Fenèt anilasyon ekspire', toastCancelPaid:'Tikè peye pa ka anile',
+      toastFetchNY:'Ap chèche rezilta Lotri NY…', toastNYUpdated:'Rezilta NY mete ajou',
+      toastNYFailed:'Sinkronizasyon NY echwe: {r}',
+      rcptPost:'POST # 01', rcptTicket:'TIKÈ #', rcptSerie:'SERI:', rcptCollect:'KOLEKTE:',
+      rcptNo:'NIM.', rcptAmount:'MONTAN', rcptTotal:'TOTAL:', rcptMaxWin:'GANY MAX:',
+      rcptCancelled:'*** ANILE ***',
+      rcptDisclaimer:"TIKÈ OU. NOU PA PEYE<br>PALE DOUB. SAN TIKÈ PA<br>GEN LAJAN.",
+      rcptDisclaimerText:"TIKÈ OU. NOU PA PEYE\nPALE DOUB. SAN TIKÈ PA\nGEN LAJAN.\n",
+      stPending:'AN ATANT', stPaid:'PEYE', stVoid:'ANILE', stCancelled:'ANILE',
+      stWinner:'GAYAN', stLoser:'PÈDAN',
+      cdLockedPaid:'Tikè peye pa ka anile.',
+      cdTicketCancelled:'Tikè a anile.',
+      cdLeftToCancel:'<b>{t}</b> rete pou anile<br><span style="opacity:.75;font-size:9px;">Fenèt fèmen 1 min apre vant</span>',
+      cdWindowExpired:'Fenèt anilasyon ekspire<br><span style="opacity:.75;font-size:9px;">Fenèt 1 minit apre vant</span>',
+      cdLocked:'Bloke',
+      groupTotals:'{stake} · {win}',
+      maxWinLabel:'GANY MAX', staked:'PARYE', confirmPaymentBtn:'KONFIME PEMAN',
+      voidBtn:'ANILE', noTicketsYet:'Pa gen tikè ankò.',
+      selectTicketPreview:'Chwazi yon tikè pou wè.',
+      statusWinnerPrize:'GAYAN ({p})',
+      ticketSentMeta:'Voye: {d}',
+      winnerPrizeNote:'🎉 GAYAN! Pri: {p}',
+      paidOn:'✓ Peye sou {d}', voidedOn:'✕ Anile sou {d}', cancelledOn:'✕ ANILE sou {d}'
+    }
+  };
+
+  function t(key, vars){
+    if(!key) return '';
+    const dict = I18N[currentLang] || I18N.en;
+    let s = dict[key];
+    if(s === undefined) s = I18N.en[key];
+    if(s === undefined) s = key;
+    if(vars){
+      Object.keys(vars).forEach(k => { s = s.split('{'+k+'}').join(String(vars[k])); });
+    }
+    return s;
+  }
+  function detectLang(){
+    const saved = store.getMeta(LANG_KEY);
+    if(saved && LANGS.indexOf(saved) >= 0) return saved;
+    try{
+      const nav = (navigator.language || 'en').toLowerCase();
+      if(nav.indexOf('es') === 0) return 'es';
+      if(nav.indexOf('ht') === 0 || nav.indexOf('fr-ht') === 0) return 'ht';
+    }catch(e){}
+    return 'en';
+  }
+  function setLang(lang){
+    if(LANGS.indexOf(lang) < 0) lang = 'en';
+    currentLang = lang;
+    store.setMeta(LANG_KEY, lang);
+    applyLanguage();
+  }
+  function cycleLang(){
+    const i = LANGS.indexOf(currentLang);
+    const next = LANGS[(i+1) % LANGS.length];
+    setLang(next);
+    showToast(t('toastLang', { l: LANG_NAMES[next] }), 'ok');
+  }
+  function applyI18nDOM(){
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const k = el.getAttribute('data-i18n');
+      el.textContent = t(k);
+    });
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+      el.setAttribute('title', t(el.getAttribute('data-i18n-title')));
+    });
+  }
+  function applyLanguage(){
+    applyI18nDOM();
+    const lb = document.getElementById('langBadge');
+    if(lb){ lb.textContent = LANG_SHORT[currentLang] || 'EN'; lb.title = LANG_NAMES[currentLang] || 'English'; }
+    document.documentElement.lang = currentLang;
+    try{ renderChip(); }catch(e){}
+    try{ renderFields(); }catch(e){}
+    try{ renderBets(); }catch(e){}
+    try{ refreshOpenCount(); }catch(e){}
+    try{ if(document.getElementById('resultsModal').classList.contains('open')) runResults(); }catch(e){}
+    try{ if(document.getElementById('salesModal').classList.contains('open')) runSalesReport(); }catch(e){}
+    try{
+      const m = document.getElementById('ticketsOptionsModal');
+      if(m && m.classList.contains('open')) refreshTicketOptionsSelect(document.getElementById('ticketSelect').value);
+    }catch(e){}
+  }
+
   /* ---- CURRENCY ---- */
   const CURRENCIES=['USD','MXN','DOP','EUR','GBP','COP','BRL'];
   let currentCurrency='USD';
@@ -884,25 +1335,25 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
   function updateCurrencyFormatter(){
     try{ currencyFormatter=new Intl.NumberFormat('en-US',{style:'currency',currency:currentCurrency,minimumFractionDigits:2,maximumFractionDigits:2}); currencyFormatter0=new Intl.NumberFormat('en-US',{style:'currency',currency:currentCurrency,minimumFractionDigits:0,maximumFractionDigits:0}); }
     catch(e){ currencyFormatter={format:n=>'$'+n.toFixed(2)}; currencyFormatter0={format:n=>'$'+n.toFixed(0)}; }
-    const b=$('currencyBadge'); if(b) b.textContent=currentCurrency;
+    const b=document.getElementById('currencyBadge'); if(b) b.textContent=currentCurrency;
   }
   function cycleCurrency(){
     const i=CURRENCIES.indexOf(currentCurrency); currentCurrency=CURRENCIES[(i+1)%CURRENCIES.length];
     store.setMeta(CURRENCY_KEY,currentCurrency); updateCurrencyFormatter();
     renderBets(); refreshOpenCount();
-    if($('salesModal').classList.contains('open')) runSalesReport();
-    if($('ticketsOptionsModal').classList.contains('open')) refreshTicketOptionsSelect($('ticketSelect').value);
-    showToast('Currency set to '+currentCurrency,'ok');
+    if(document.getElementById('salesModal').classList.contains('open')) runSalesReport();
+    if(document.getElementById('ticketsOptionsModal').classList.contains('open')) refreshTicketOptionsSelect(document.getElementById('ticketSelect').value);
+    showToast(t('toastCurrency', { c: currentCurrency }),'ok');
   }
 
-  function loadPhone(){ const p=store.getMeta(PHONE_KEY); if(p) $('phoneInput').value=p; }
+  function loadPhone(){ const p=store.getMeta(PHONE_KEY); if(p) document.getElementById('phoneInput').value=p; }
   function savePhone(v){ store.setMeta(PHONE_KEY,v); }
   function loadTickets(){ return store.getTickets(); }
   function saveTicket(t){ return store.saveTicket(t); }
   function loadOwner(){ let o=store.getMeta(OWNER_KEY); if(!o){o='Pick3 & Pick4';store.setMeta(OWNER_KEY,o);} return o; }
   function loadUser(){ let u=store.getMeta(USER_KEY); if(!u){u='cashier';store.setMeta(USER_KEY,u);} return u; }
   function loadResultsAll(){ return store.getResults(); }
-  function saveResultsAll(obj){ const p=store.setResults(obj); const mm=$('monitorModal'); if(mm&&mm.classList.contains('open')) renderMonitor(); return p; }
+  function saveResultsAll(obj){ const p=store.setResults(obj); const mm=document.getElementById('monitorModal'); if(mm&&mm.classList.contains('open')) renderMonitor(); return p; }
   function getDayResults(date){ return loadResultsAll()[date]||{}; }
   function setResultFor(date,lot,field,val){ const all=loadResultsAll(); if(!all[date]) all[date]={}; if(!all[date][lot]) all[date][lot]={}; if(val) all[date][lot][field]=val; else delete all[date][lot][field]; saveResultsAll(all); }
 
@@ -947,7 +1398,7 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
     state.activeLots=state.activeLots.filter(n=>lotteryStatus(n,now).status==='open');
     if(!state.activeLots.length){ const op=LOTTERIES.map(l=>({l,s:lotteryStatus(l.name,now)})).filter(x=>x.s.status==='open').sort((a,b)=>a.s.at-b.s.at); if(op.length) state.activeLots=[op[0].l.name]; }
     const changed=before.join(',')!==state.activeLots.join(',');
-    if(changed){ renderChip(); const rm=before.filter(x=>state.activeLots.indexOf(x)<0); if(rm.length) showToast(rm.join(', ')+' closed — switched','err'); }
+    if(changed){ renderChip(); const rm=before.filter(x=>state.activeLots.indexOf(x)<0); if(rm.length) showToast(t('toastClosedSwitched',{names:rm.join(', ')}),'err'); }
     return changed;
   }
   const LEGACY_NAME_MAP={'TEXAS EVENING':'TEXAS-EVENING','PENNSYLVANIA AM':'PENNSYLV AM','PENNSYLVANIA PM':'PENNSYLV PM','CONNECTICUT AM':'CONNECT AM','CONNECTICUT PM':'CONNECT PM','FL PICK 2 AM':'FL PICK2 AM'};
@@ -959,10 +1410,10 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
     tk.forEach(t=>{ (t.bets||[]).forEach(b=>{ if(LEGACY_NAME_MAP[b.lottery]){ b.lottery=LEGACY_NAME_MAP[b.lottery]; tc=true; } }); if(t.won!==undefined){delete t.won;tc=true;} if(t.lost!==undefined){delete t.lost;tc=true;} if(t.prize!==undefined){delete t.prize;tc=true;} if(t.printedAt!==undefined){delete t.printedAt;tc=true;} if(t.maxWin!==undefined){delete t.maxWin;tc=true;} });
     if(tc) store.setTickets(tk);
   }
-  function renderChip(){ const n=state.activeLots; const p=LOTTERIES.find(l=>l.name===n[0])||LOTTERIES[0]; $('lotDot').style.background=p.color; $('lotDot').style.color=p.color; $('lotName').textContent=n.length===1?p.name:n.length+' lotteries'; }
+  function renderChip(){ const n=state.activeLots; const p=LOTTERIES.find(l=>l.name===n[0])||LOTTERIES[0]; $('lotDot').style.background=p.color; $('lotDot').style.color=p.color; $('lotName').textContent=n.length===1?p.name:t('lotteries',{n:n.length})||n.length+' lotteries'; }
   function fmtNum(num){ const m=num.match(/^(\d+)([A-Z]+)$/); if(m) return m[1]+'<span class="sfx">'+m[2]+'</span>'; const c=num.match(/^(\d+)x(\d+)$/); if(c) return c[1]+'<span class="sfx">x</span>'+c[2]; if(/X/.test(num)) return num.replace(/X/g,'<span class="wild">X</span>'); return num; }
   function renderFields(){ const nb=$('fieldNum').querySelector('.box'); const ab=$('fieldAmt').querySelector('.box'); nb.innerHTML=state.num?fmtNum(state.num):'<span class="ph">—</span>'; ab.innerHTML=state.amount?state.amount:'<span class="ph">0.00</span>'; $('fieldNum').classList.toggle('active',state.field==='num'); $('fieldAmt').classList.toggle('active',state.field==='amount'); }
-  function getBetCategory(num){ const t=classify(num); if(t.type==='pale'||t.type==='combo') return 'PALE'; if(t.type==='straight'||t.type==='box'){ if(t.digits.length===2) return 'PICK2'; if(t.digits.length===3) return 'PICK3'; if(t.digits.length===4) return 'PICK4'; } if(t.type==='pair'){ if(num.length===2) return 'PICK2'; if(num.length===3) return 'PICK3'; if(num.length===4) return 'PICK4'; } return 'PICK3'; }
+  function getBetCategory(num){ const t2=classify(num); if(t2.type==='pale'||t2.type==='combo') return 'PALE'; if(t2.type==='straight'||t2.type==='box'){ if(t2.digits.length===2) return 'PICK2'; if(t2.digits.length===3) return 'PICK3'; if(t2.digits.length===4) return 'PICK4'; } if(t2.type==='pair'){ if(num.length===2) return 'PICK2'; if(num.length===3) return 'PICK3'; if(num.length===4) return 'PICK4'; } return 'PICK3'; }
 
   function renderBets(){
     const cats={PICK2:[],PALE:[],PICK3:[],PICK4:[]};
@@ -970,7 +1421,7 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
     ['PICK2','PALE','PICK3','PICK4'].forEach(c=>{
       const tb=$('tbody_'+c); if(!tb) return;
       const bets=cats[c];
-      if(!bets.length){ tb.innerHTML='<tr class="cat-empty"><td colspan="4">Empty</td></tr>'; $('count_'+c).textContent='0'; $('total_'+c).textContent=money(0); return; }
+      if(!bets.length){ tb.innerHTML='<tr class="cat-empty"><td colspan="4">'+escapeHtml(t('empty'))+'</td></tr>'; $('count_'+c).textContent='0'; $('total_'+c).textContent=money(0); return; }
       let tot=0;
       tb.innerHTML=bets.map(b=>{ tot+=b.amount; return '<tr><td class="lot">'+escapeHtml(b.lottery)+'</td><td class="num">'+fmtNum(b.number)+'</td><td class="amt">'+money(b.amount)+'</td><td><button class="del" data-id="'+b.id+'">×</button></td></tr>'; }).join('');
       $('count_'+c).textContent=bets.length; $('total_'+c).textContent=money(tot);
@@ -978,7 +1429,7 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
     bindDeletes($('betsPanel'));
     const cnt=$('betsCount'); if(cnt) cnt.textContent=state.bets.length;
     $('total').textContent=money(grandStake());
-    $('maxwin').textContent='win '+payoutFmt(grandWin());
+    $('maxwin').textContent=t('maxWinShort')+' '+payoutFmt(grandWin());
   }
   function bindDeletes(root){ root.querySelectorAll('.del').forEach(btn=>btn.addEventListener('click',e=>{ e.stopPropagation(); removeBet(+btn.dataset.id); })); }
   function perms(s){ const out=new Set(); (function go(a,c){ if(!a.length){out.add(c.join(''));return;} for(let i=0;i<a.length;i++){ const cp=a.slice(), n=cp.splice(i,1); go(cp,c.concat(n)); } })(s.split(''),[]); return [...out]; }
@@ -994,25 +1445,25 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
   function addBet(){
     const now=nowETAsLocal().getTime();
     const closed=state.activeLots.filter(n=>lotteryStatus(n,now).status==='closed');
-    if(closed.length){ reconcileActiveLots(); showToast(closed.join(', ')+' closed','err'); return false; }
-    if(!state.activeLots.length){ showToast('Select at least one lottery','err'); return false; }
-    if(!state.num){ showToast('Enter a number','err'); state.field='num'; renderFields(); return false; }
-    const amt=parseFloat(state.amount); if(!amt||amt<=0){ showToast('Enter amount','err'); state.field='amount'; renderFields(); return false; }
-    const nums=parseBet(state.num); if(!nums){ showToast('Invalid number','err'); return false; }
-    const dead=nums.find(n=>multiplierOf(n)<=0); if(dead){ showToast('Incomplete play: '+dead,'err'); return false; }
+    if(closed.length){ reconcileActiveLots(); showToast(t('toastClosedSwitched',{names:closed.join(', ')}),'err'); return false; }
+    if(!state.activeLots.length){ showToast(t('toastSelectLottery'),'err'); return false; }
+    if(!state.num){ showToast(t('toastEnterNumber'),'err'); state.field='num'; renderFields(); return false; }
+    const amt=parseFloat(state.amount); if(!amt||amt<=0){ showToast(t('toastEnterAmount'),'err'); state.field='amount'; renderFields(); return false; }
+    const nums=parseBet(state.num); if(!nums){ showToast(t('toastInvalidNumber'),'err'); return false; }
+    const dead=nums.find(n=>multiplierOf(n)<=0); if(dead){ showToast(t('toastInvalidPlay')+': '+dead,'err'); return false; }
     const raw=state.num; let merged=0, created=0;
     state.activeLots.forEach(lot=>{ nums.forEach(num=>{ const ex=state.bets.find(b=>b.lottery===lot&&b.number===num); if(ex){ ex.amount=+(ex.amount+amt).toFixed(2); merged++; } else { state.bets.push({id:++state.seq,lottery:lot,number:num,amount:amt,origin:raw}); created++; } }); });
-    if(merged>0&&created===0) showToast('Merged with existing bets','ok');
-    else if(merged>0) showToast('Some bets merged','ok');
-    else if(state.activeLots.length>1) showToast('Added to '+state.activeLots.length+' lotteries','ok');
+    if(merged>0&&created===0) showToast(t('toastMergedExisting'),'ok');
+    else if(merged>0) showToast(t('toastSomeMerged'),'ok');
+    else if(state.activeLots.length>1) showToast(t('toastAddedLotteries',{n:state.activeLots.length}),'ok');
     state.num=''; state.amount=''; state.field='num'; renderFields(); renderBets(); return true;
   }
   function removeBet(id){ state.bets=state.bets.filter(b=>b.id!==id); renderBets(); if(state.previewOpen){ if(!state.bets.length) closeTicketPreview(); else renderTicketPreview(); } }
   function nextTicketCode(){ let s=parseInt(store.getMeta(TICKET_SEQ_KEY)||'0',10)||0; s+=1; store.setMeta(TICKET_SEQ_KEY,String(s)); return 'T'+SESSION_SALT+s.toString(36).toUpperCase().padStart(4,'0'); }
   function countOpenTickets(){ const op=loadTickets().filter(t=>!t.paid&&!t.voided&&!t.cancelled); return {count:op.length,value:+op.reduce((s,t)=>s+(t.stake||0),0).toFixed(2)}; }
-  function refreshOpenCount(){ const el=$('openCount'); if(!el) return; const {count,value}=countOpenTickets(); if(!count){ el.style.display='none'; return; } el.style.display='inline-block'; el.textContent='OPEN '+count+' · '+money(value); el.classList.toggle('hot',count>=5); }
-  function fmtMmSs(ms){ const t=Math.max(0,Math.ceil(ms/1000)); return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0'); }
-  function cancelWindowRemaining(t){ if(!t) return 0; const at=new Date(t.sentAt).getTime(); if(isNaN(at)) return 0; return Math.max(0,CANCEL_WINDOW_MS-(Date.now()-at)); }
+  function refreshOpenCount(){ const el=$('openCount'); if(!el) return; const {count,value}=countOpenTickets(); if(!count){ el.style.display='none'; return; } el.style.display='inline-block'; el.textContent=t('openShort')+' '+count+' · '+money(value); el.classList.toggle('hot',count>=5); }
+  function fmtMmSs(ms){ const t2=Math.max(0,Math.ceil(ms/1000)); return String(Math.floor(t2/60)).padStart(2,'0')+':'+String(t2%60).padStart(2,'0'); }
+  function cancelWindowRemaining(t2){ if(!t2) return 0; const at=new Date(t2.sentAt).getTime(); if(isNaN(at)) return 0; return Math.max(0,CANCEL_WINDOW_MS-(Date.now()-at)); }
   function fmtDateTimeUS(d){ const p=_FMT_12H.formatToParts(d); return _getPart(p,'month')+'.'+_getPart(p,'day')+'.'+_getPart(p,'year')+' '+_getPart(p,'hour')+':'+_getPart(p,'minute')+' '+_getPart(p,'dayPeriod'); }
   function fmtDrawTime12(name){ const h=DRAW_SCHEDULE[name]; if(!h) return ''; const b=h.split(':'); const hh=Number(b[0]), mm=Number(b[1]); const ap=hh>=12?'PM':'AM'; let h12=hh%12; if(h12===0) h12=12; return pad2(h12)+':'+pad2(mm)+' '+ap; }
   function receiptNum(num){ const s=String(num); const m=s.match(/^(\d+)([A-Z])$/); if(m){ if(m[2]==='S') return m[1]; return m[1]+m[2]; } return s; }
@@ -1023,67 +1474,67 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
     const code=opts.code||'—', when=opts.sentAt?new Date(opts.sentAt):new Date(), bets=opts.bets||[], stake=+(opts.stake||0), maxWin=computeMaxWin(bets), serial=receiptSerial(code);
     const gm=new Map(); bets.forEach(b=>{ let g=gm.get(b.lottery); if(!g){ g={lottery:b.lottery,bets:[]}; gm.set(b.lottery,g); } g.bets.push(b); }); const groups=[...gm.values()];
     let html='<div class="receipt">';
-    if(opts.cancelled) html+='<div class="rcpt-cancelled">*** CANCELLED ***</div>';
-    html+='<div class="rcpt-title">POST # 01</div>';
-    html+='<div class="rcpt-ticket">TICKET # '+escapeHtml(code)+'</div>';
+    if(opts.cancelled) html+='<div class="rcpt-cancelled">'+escapeHtml(t('rcptCancelled'))+'</div>';
+    html+='<div class="rcpt-title">'+escapeHtml(t('rcptPost'))+'</div>';
+    html+='<div class="rcpt-ticket">'+escapeHtml(t('rcptTicket'))+' '+escapeHtml(code)+'</div>';
     html+='<div class="rcpt-date">'+fmtDateTimeUS(when)+'</div>';
-    html+='<div class="rcpt-serial">SERIE: '+serial.serie+'<br>COLLECT: '+serial.collect+'</div>';
+    html+='<div class="rcpt-serial">'+escapeHtml(t('rcptSerie'))+' '+serial.serie+'<br>'+escapeHtml(t('rcptCollect'))+' '+serial.collect+'</div>';
     groups.forEach(g=>{
       const gb=g.bets, rows=Math.ceil(gb.length/2), left=gb.slice(0,rows), right=gb.slice(rows), draw=fmtDrawTime12(g.lottery);
       html+='<div class="rcpt-div"></div>';
       html+='<div class="rcpt-lot">'+escapeHtml(g.lottery)+(draw?' - '+draw:'')+'</div>';
       html+='<div class="rcpt-div"></div>';
-      html+='<div class="rcpt-cols"><div>NO.</div><div>AMOUNT</div><div>NO.</div><div>AMOUNT</div></div>';
+      html+='<div class="rcpt-cols"><div>'+escapeHtml(t('rcptNo'))+'</div><div>'+escapeHtml(t('rcptAmount'))+'</div><div>'+escapeHtml(t('rcptNo'))+'</div><div>'+escapeHtml(t('rcptAmount'))+'</div></div>';
       html+='<div class="rcpt-div"></div><div class="rcpt-rows">';
       for(let i=0;i<rows;i++){ const l=left[i], r=right[i]; html+='<div class="rcpt-row"><div>'+(l?escapeHtml(receiptNum(l.number)):'')+'</div><div>'+(l?money(l.amount):'')+'</div><div>'+(r?escapeHtml(receiptNum(r.number)):'')+'</div><div>'+(r?money(r.amount):'')+'</div></div>'; }
       html+='</div>';
     });
     html+='<div class="rcpt-div"></div>';
-    html+='<div class="rcpt-total"><span>TOTAL:</span><span>'+money(stake)+'</span></div>';
-    if(maxWin>0) html+='<div class="rcpt-total subtotal"><span>MAX WIN:</span><span>'+money(maxWin)+'</span></div>';
+    html+='<div class="rcpt-total"><span>'+escapeHtml(t('rcptTotal'))+'</span><span>'+money(stake)+'</span></div>';
+    if(maxWin>0) html+='<div class="rcpt-total subtotal"><span>'+escapeHtml(t('rcptMaxWin'))+'</span><span>'+money(maxWin)+'</span></div>';
     html+='<div class="rcpt-div"></div>';
     html+='<div class="rcpt-foot">PICK2 $65 · PICK3 $650 · PICK4 $4,000<br>PALE $800 · BOX3 $80 · BOX6 $100<br>BOX4 $400 · BOX6 $250 · BOX12 $150 · BOX24 $100<br>PAIRS 2d $6.5 · 3d $65/$15 · 4d $15/$10/$5</div>';
-    html+='<div class="rcpt-disc">YOUR TICKET. WE DON\'T PAY<br>DOUBLE PALE. NO TICKET NO<br>MONEY.</div></div>';
+    html+='<div class="rcpt-disc">'+t('rcptDisclaimer')+'</div></div>';
     return html;
   }
   function buildReceiptText(ticket){
     const code=ticket.code||'—', when=ticket.sentAt?new Date(ticket.sentAt):new Date(), bets=ticket.bets||[], stake=+(ticket.stake||0), maxWin=computeMaxWin(bets), serial=receiptSerial(code);
     const gm=new Map(); bets.forEach(b=>{ let g=gm.get(b.lottery); if(!g){ g={lottery:b.lottery,bets:[]}; gm.set(b.lottery,g); } g.bets.push(b); }); const groups=[...gm.values()];
     function padR(s,l){ s=String(s||''); return s.length>=l?s:s+' '.repeat(l-s.length); }
-    let out=''; if(ticket.cancelled){ out+='***********************************\n*         CANCELLED TICKET        *\n***********************************\n\n'; }
-    out+='POST # 01\nTICKET # '+code+'\n'+fmtDateTimeUS(when)+'\n\nSERIE: '+serial.serie+'\nCOLLECT: '+serial.collect+'\n- - - - - - - - - - - - - - - -\n';
-    groups.forEach(g=>{ const gb=g.bets, rows=Math.ceil(gb.length/2), left=gb.slice(0,rows), right=gb.slice(rows), draw=fmtDrawTime12(g.lottery); out+=g.lottery+(draw?' - '+draw:'')+'\n- - - - - - - - - - - - - - - -\nNO.      AMOUNT      NO.      AMOUNT\n- - - - - - - - - - - - - - - -\n'; for(let i=0;i<rows;i++){ const l=left[i], r=right[i]; out+=padR(l?receiptNum(l.number):'',9)+padR(l?money(l.amount):'',12)+padR(r?receiptNum(r.number):'',9)+(r?money(r.amount):'')+'\n'; } });
-    out+='- - - - - - - - - - - - - - - -\n'+padR('TOTAL:',20)+money(stake)+'\n'; if(maxWin>0) out+=padR('MAX WIN:',20)+money(maxWin)+'\n';
-    out+='- - - - - - - - - - - - - - - -\nPICK2 $65 · PICK3 $650 · PICK4 $4,000\nPALE $800 · BOX3 $80 · BOX6 $100\nBOX4 $400 · BOX6 $250 · BOX12 $150 · BOX24 $100\nPAIRS 2d $6.5 · 3d $65/$15 · 4d $15/$10/$5\n\nYOUR TICKET. WE DON\'T PAY\nDOUBLE PALE. NO TICKET NO\nMONEY.\n';
+    let out=''; if(ticket.cancelled){ out+='***********************************\n*         '+t('rcptCancelled').replace(/\*/g,'').trim()+'        *\n***********************************\n\n'; }
+    out+=t('rcptPost')+'\n'+t('rcptTicket')+' '+code+'\n'+fmtDateTimeUS(when)+'\n\n'+t('rcptSerie')+' '+serial.serie+'\n'+t('rcptCollect')+' '+serial.collect+'\n- - - - - - - - - - - - - - - -\n';
+    groups.forEach(g=>{ const gb=g.bets, rows=Math.ceil(gb.length/2), left=gb.slice(0,rows), right=gb.slice(rows), draw=fmtDrawTime12(g.lottery); out+=g.lottery+(draw?' - '+draw:'')+'\n- - - - - - - - - - - - - - - -\n'+t('rcptNo')+'      '+t('rcptAmount')+'      '+t('rcptNo')+'      '+t('rcptAmount')+'\n- - - - - - - - - - - - - - - -\n'; for(let i=0;i<rows;i++){ const l=left[i], r=right[i]; out+=padR(l?receiptNum(l.number):'',9)+padR(l?money(l.amount):'',12)+padR(r?receiptNum(r.number):'',9)+(r?money(r.amount):'')+'\n'; } });
+    out+='- - - - - - - - - - - - - - - -\n'+padR(t('rcptTotal'),20)+money(stake)+'\n'; if(maxWin>0) out+=padR(t('rcptMaxWin'),20)+money(maxWin)+'\n';
+    out+='- - - - - - - - - - - - - - - -\nPICK2 $65 · PICK3 $650 · PICK4 $4,000\nPALE $800 · BOX3 $80 · BOX6 $100\nBOX4 $400 · BOX6 $250 · BOX12 $150 · BOX24 $100\nPAIRS 2d $6.5 · 3d $65/$15 · 4d $15/$10/$5\n\n'+t('rcptDisclaimerText');
     return out;
   }
   function receiptWrap(h){ return '<div class="receipt-wrap">'+h+'</div>'; }
   function printReceiptHtml(html){ if(!html) return; const b=$('printBody'); if(!b) return; b.innerHTML=html; printModal('printModal'); }
 
-  function openTicketPreview(){ if(!state.bets.length){ showToast('No bets to preview','err'); return; } state.previewOpen=true; if(!state._ticketCode) state._ticketCode=nextTicketCode(); renderTicketPreview(); $('ticketSheet').classList.add('open'); $('backdrop').classList.add('show'); }
+  function openTicketPreview(){ if(!state.bets.length){ showToast(t('toastNoBetsPreview'),'err'); return; } state.previewOpen=true; if(!state._ticketCode) state._ticketCode=nextTicketCode(); renderTicketPreview(); $('ticketSheet').classList.add('open'); $('backdrop').classList.add('show'); }
   function closeTicketPreview(){ state.previewOpen=false; $('ticketSheet').classList.remove('open'); $('backdrop').classList.remove('show'); }
-  function renderTicketPreview(){ if(!state.bets.length){ closeTicketPreview(); return; } $('ticketBody').innerHTML=receiptWrap(buildTicketReceipt({code:state._ticketCode||'—',sentAt:new Date().toISOString(),bets:state.bets,stake:grandStake()})); $('ticketHead').textContent='Ticket Preview · '+state.bets.length+(state.bets.length===1?' bet':' bets'); }
+  function renderTicketPreview(){ if(!state.bets.length){ closeTicketPreview(); return; } $('ticketBody').innerHTML=receiptWrap(buildTicketReceipt({code:state._ticketCode||'—',sentAt:new Date().toISOString(),bets:state.bets,stake:grandStake()})); $('ticketHead').textContent=t('ticketPreview')+' · '+state.bets.length+(state.bets.length===1?' bet':' bets'); }
   async function ensureTicketSaved(){
     if(!state._ticketCode||!state.bets.length) return null;
-    const code=state._ticketCode, tickets=loadTickets(), idx=tickets.findIndex(t=>t.code===code);
-    if(idx>=0){ const ex=tickets[idx]; ex.bets=state.bets.map(b=>({lottery:b.lottery,number:b.number,amount:b.amount,origin:b.origin})); ex.stake=grandStake(); try{ await store.setTickets(tickets); }catch(e){ showToast('Could not update ticket','err'); return null; } return ex; }
+    const code=state._ticketCode, tickets=loadTickets(), idx=tickets.findIndex(t2=>t2.code===code);
+    if(idx>=0){ const ex=tickets[idx]; ex.bets=state.bets.map(b=>({lottery:b.lottery,number:b.number,amount:b.amount,origin:b.origin})); ex.stake=grandStake(); try{ await store.setTickets(tickets); }catch(e){ showToast(t('toastCouldNotUpdate'),'err'); return null; } return ex; }
     const ticket={code,sentAt:new Date().toISOString(),bets:state.bets.map(b=>({lottery:b.lottery,number:b.number,amount:b.amount,origin:b.origin})),stake:grandStake(),paid:false,voided:false,cancelled:false};
-    try{ await saveTicket(ticket); refreshOpenCount(); return ticket; }catch(e){ showToast('Could not save ticket','err'); return null; }
+    try{ await saveTicket(ticket); refreshOpenCount(); return ticket; }catch(e){ showToast(t('toastCouldNotSave'),'err'); return null; }
   }
   function clearBetState(){ state.bets=[]; state.num=''; state.amount=''; state.field='num'; state._ticketCode=null; state.previewOpen=false; renderFields(); renderBets(); closeTicketPreview(); }
   async function sendCurrentTicketToWhatsApp(){
-    if(!state.bets.length){ showToast('No bets to send','err'); return; }
-    const phone=($('phoneInput').value||'').replace(/\D/g,''); if(!phone||phone.length<7){ showToast('Enter a valid WhatsApp number','err'); $('phoneInput').focus(); return; }
-    savePhone(phone); const t=await ensureTicketSaved(); if(!t) return;
-    const text=buildReceiptText(t); const url='https://wa.me/'+phone+'?text='+encodeURIComponent(text); const win=window.open(url,'_blank'); if(!win) window.location.href=url;
-    clearBetState(); showToast('Opening WhatsApp…','ok'); refreshOpenCount(); refreshTicketOptionsIfOpen();
+    if(!state.bets.length){ showToast(t('toastNoBetsToSend'),'err'); return; }
+    const phone=($('phoneInput').value||'').replace(/\D/g,''); if(!phone||phone.length<7){ showToast(t('toastEnterValidPhone'),'err'); $('phoneInput').focus(); return; }
+    savePhone(phone); const t2=await ensureTicketSaved(); if(!t2) return;
+    const text=buildReceiptText(t2); const url='https://wa.me/'+phone+'?text='+encodeURIComponent(text); const win=window.open(url,'_blank'); if(!win) window.location.href=url;
+    clearBetState(); showToast(t('toastOpeningWhatsApp'),'ok'); refreshOpenCount(); refreshTicketOptionsIfOpen();
   }
-  async function printCurrentTicket(){ if(!state.bets.length){ showToast('No bets to print','err'); return; } const t=await ensureTicketSaved(); if(!t) return; printReceiptHtml(receiptWrap(buildTicketReceipt({code:t.code,sentAt:t.sentAt,bets:t.bets,stake:t.stake}))); showToast('Ticket printed — cancel window started','ok'); }
+  async function printCurrentTicket(){ if(!state.bets.length){ showToast(t('toastNoBetsToPrint'),'err'); return; } const t2=await ensureTicketSaved(); if(!t2) return; printReceiptHtml(receiptWrap(buildTicketReceipt({code:t2.code,sentAt:t2.sentAt,bets:t2.bets,stake:t2.stake}))); showToast(t('toastTicketPrinted'),'ok'); }
 
   function fmtDateBadgeET(d){ const p=_partsET(d); return _getPart(p,'weekday')+', '+_getPart(p,'day')+' '+_getPart(p,'month')+' '+_getPart(p,'year'); }
   function fmtTimeBadgeET(d){ const p=_FMT_12H.formatToParts(d); return _getPart(p,'hour')+':'+_getPart(p,'minute')+':'+_getPart(p,'second')+' '+_getPart(p,'dayPeriod'); }
   function fmtIsoShort(iso){ if(!iso) return '—'; const d=new Date(iso); if(isNaN(d.getTime())) return '—'; const p=_FMT_12H_SHORT.formatToParts(d); return _getPart(p,'month')+'/'+_getPart(p,'day')+'/'+_getPart(p,'year')+' '+_getPart(p,'hour')+':'+_getPart(p,'minute')+' '+_getPart(p,'dayPeriod')+' ET'; }
-  function tickClock(){ const n=new Date(); const d=$('date_display'), t=$('time_display'); if(d) d.textContent=fmtDateBadgeET(n); if(t) t.textContent=fmtTimeBadgeET(n); }
+  function tickClock(){ const n=new Date(); const d=$('date_display'), t2=$('time_display'); if(d) d.textContent=fmtDateBadgeET(n); if(t2) t2.textContent=fmtTimeBadgeET(n); }
 
   function pressKey(k){
     if(state.previewOpen){ if(k==='ENTER') sendCurrentTicketToWhatsApp(); return; }
@@ -1095,7 +1546,7 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
       const last=state.num.slice(-1);
       if(isS&&['.','Q','+'].indexOf(last)!==-1){ const cand=state.num.slice(0,-1)+char; if(isValidPrefix(cand)){ state.num=cand; state.field='amount'; renderFields(); return; } }
       const cand=state.num+char;
-      if(isValidPrefix(cand)){ state.num=cand; if(isS) state.field='amount'; } else showToast('Invalid for Play rules','err');
+      if(isValidPrefix(cand)){ state.num=cand; if(isS) state.field='amount'; } else showToast(t('toastInvalidPlay'),'err');
       renderFields(); return;
     }
     if(/^\d$/.test(k)){ const p=state.amount.split('.'); if(p[1]!==undefined&&p[1].length>=2) return; if(p[1]===undefined&&p[0].length>=6) return; state.amount+=k; }
@@ -1104,19 +1555,19 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
   }
 
   let lotTickTimer=null;
-  function fmtCountdown(ms){ if(ms<=0) return '00:00:00'; const t=Math.floor(ms/1000); return pad2(Math.floor(t/3600))+':'+pad2(Math.floor((t%3600)/60))+':'+pad2(t%60); }
+  function fmtCountdown(ms){ if(ms<=0) return '00:00:00'; const t2=Math.floor(ms/1000); return pad2(Math.floor(t2/3600))+':'+pad2(Math.floor((t2%3600)/60))+':'+pad2(t2%60); }
   function renderLotTableBody(){
     const now=nowETAsLocal().getTime();
     const all=LOTTERIES.map(l=>{ const s=lotteryStatus(l.name,now); return {l,status:s.status,at:s.at}; });
     const op=all.filter(x=>x.status==='open').sort((a,b)=>a.at-b.at);
     const cl=all.filter(x=>x.status==='closed');
     const renderOpen=({l,at})=>{ const sel=state.activeLots.indexOf(l.name)>=0; return '<tr class="lot-row'+(sel?' selected':'')+'" data-name="'+escapeHtml(l.name)+'" data-status="open" style="--row-color:'+l.color+';"><td>'+escapeHtml(l.name)+'</td><td class="lot-time" data-close-at="'+at+'"><i class="far fa-clock"></i> <span class="lot-cd">'+fmtCountdown(at-now)+'</span></td><td><input type="checkbox" class="lotteryCheckbox"'+(sel?' checked':'')+'></td></tr>'; };
-    const renderClosed=({l})=>'<tr class="lot-row closed" data-name="'+escapeHtml(l.name)+'" data-status="closed"><td>'+escapeHtml(l.name)+'</td><td class="lot-time"><i class="fas fa-lock"></i> CLOSED</td><td></td></tr>';
+    const renderClosed=({l})=>'<tr class="lot-row closed" data-name="'+escapeHtml(l.name)+'" data-status="closed"><td>'+escapeHtml(l.name)+'</td><td class="lot-time"><i class="fas fa-lock"></i> '+escapeHtml(t('closed'))+'</td><td></td></tr>';
     return op.map(renderOpen).join('')+cl.map(renderClosed).join('');
   }
   function bindLotRows(){
     const body=$('lot_body'); if(!body) return;
-    body.querySelectorAll('.lot-row').forEach(row=>{ row.addEventListener('click',()=>{ const name=row.getAttribute('data-name'), st=row.getAttribute('data-status'); if(!name) return; if(st==='closed'){ showToast(name+' is closed','err'); return; } const idx=state.activeLots.indexOf(name); if(idx>=0){ if(state.activeLots.length===1) showToast('Select at least one lottery','err'); else state.activeLots.splice(idx,1); } else state.activeLots.push(name); body.querySelectorAll('.lot-row').forEach(r=>{ if(r.getAttribute('data-status')==='closed') return; const on=state.activeLots.indexOf(r.getAttribute('data-name'))>=0; r.classList.toggle('selected',on); const cb=r.querySelector('.lotteryCheckbox'); if(cb) cb.checked=on; }); renderChip(); }); });
+    body.querySelectorAll('.lot-row').forEach(row=>{ row.addEventListener('click',()=>{ const name=row.getAttribute('data-name'), st=row.getAttribute('data-status'); if(!name) return; if(st==='closed'){ showToast(t('toastLotteryClosed',{name:name}),'err'); return; } const idx=state.activeLots.indexOf(name); if(idx>=0){ if(state.activeLots.length===1) showToast(t('toastSelectLottery'),'err'); else state.activeLots.splice(idx,1); } else state.activeLots.push(name); body.querySelectorAll('.lot-row').forEach(r=>{ if(r.getAttribute('data-status')==='closed') return; const on=state.activeLots.indexOf(r.getAttribute('data-name'))>=0; r.classList.toggle('selected',on); const cb=r.querySelector('.lotteryCheckbox'); if(cb) cb.checked=on; }); renderChip(); }); });
   }
   function tickLotTimes(){
     const body=$('lot_body'); if(!body){ if(lotTickTimer){ clearInterval(lotTickTimer); lotTickTimer=null; } return; }
@@ -1124,7 +1575,7 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
     body.querySelectorAll('.lot-row').forEach(row=>{ if(row.getAttribute('data-status')==='closed') return; const c=row.querySelector('.lot-time'); if(!c) return; const at=parseInt(c.getAttribute('data-close-at'),10); if(isNaN(at)) return; const rem=at-now; if(rem<=0){ need=true; return; } const s=c.querySelector('.lot-cd'); if(s) s.textContent=fmtCountdown(rem); });
     if(need){ reconcileActiveLots(); body.innerHTML=renderLotTableBody(); bindLotRows(); }
   }
-  function openLotSheet(){ reconcileActiveLots(); $('lotSheetBody').innerHTML='<div class="lot-table-container"><table class="lot-table" id="lot_table"><thead><tr><th>Lottery</th><th>Next Close (ET)</th><th></th></tr></thead><tbody id="lot_body">'+renderLotTableBody()+'</tbody></table></div>'; tickLotTimes(); bindLotRows(); $('lotSheet').classList.add('open'); $('backdrop').classList.add('show'); if(lotTickTimer) clearInterval(lotTickTimer); lotTickTimer=setInterval(tickLotTimes,1000); }
+  function openLotSheet(){ reconcileActiveLots(); $('lotSheetBody').innerHTML='<div class="lot-table-container"><table class="lot-table" id="lot_table"><thead><tr><th>'+escapeHtml(t('lottery'))+'</th><th>Next Close (ET)</th><th></th></tr></thead><tbody id="lot_body">'+renderLotTableBody()+'</tbody></table></div>'; tickLotTimes(); bindLotRows(); $('lotSheet').classList.add('open'); $('backdrop').classList.add('show'); if(lotTickTimer) clearInterval(lotTickTimer); lotTickTimer=setInterval(tickLotTimes,1000); }
   function closeSheet(){ $('lotSheet').classList.remove('open'); $('backdrop').classList.remove('show'); if(lotTickTimer){ clearInterval(lotTickTimer); lotTickTimer=null; } }
 
   function openModal(id){ const m=document.getElementById(id); if(m) m.classList.add('open'); }
@@ -1132,27 +1583,26 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
   function closeAllModals(){ document.querySelectorAll('.modal.open').forEach(m=>m.classList.remove('open')); stopTicketOptionsTimer(); stopMonitorTicker(); }
   function printModal(id){ const m=document.getElementById(id); if(!m) return; document.body.classList.add('printing'); m.classList.add('printing-modal'); requestAnimationFrame(()=>{ window.print(); setTimeout(()=>{ document.body.classList.remove('printing'); m.classList.remove('printing-modal'); },200); }); }
 
-  /* ---- RESULTS / SALES / TICKETS (kept verbatim from prior answer, unchanged) ---- */
   const RESULT_FIELDS=[{key:'r1',max:2},{key:'r2',max:2},{key:'r3',max:2},{key:'pick3',max:3},{key:'pick4',max:4}];
-  function seedDefaultResults(){ const t=todayISO(); const a=loadResultsAll(); if(a[t]&&Object.keys(a[t]).length>0) return; a[t]=a[t]||{}; a[t]['TEXAS-EVENING']={r1:'79',r2:'05',r3:'02',pick3:'379',pick4:'0502'}; saveResultsAll(a); }
+  function seedDefaultResults(){ const t2=todayISO(); const a=loadResultsAll(); if(a[t2]&&Object.keys(a[t2]).length>0) return; a[t2]=a[t2]||{}; a[t2]['TEXAS-EVENING']={r1:'79',r2:'05',r3:'02',pick3:'379',pick4:'0502'}; saveResultsAll(a); }
   function migrateResults(){
     const all=loadResultsAll(); let ch=false;
     Object.keys(all).forEach(dk=>{ Object.keys(all[dk]).forEach(ln=>{ const r=all[dk][ln]; if(r.pick3&&r.pick3.length===3){ const d1=r.pick3.slice(-2); if(r.r1!==d1){ r.r1=d1; ch=true; } } if(r.pick4&&r.pick4.length===4){ const d2=r.pick4.slice(0,2), d3=r.pick4.slice(2,4); if(r.r2!==d2){ r.r2=d2; ch=true; } if(r.r3!==d3){ r.r3=d3; ch=true; } } if(r.pick2!==undefined){ delete r.pick2; ch=true; } if(r.pale!==undefined){ delete r.pale; ch=true; } }); });
     if(ch) saveResultsAll(all);
   }
-  function ticketDateKey(t){ const d=new Date(t.sentAt); return isNaN(d.getTime())?null:dateKeyET(d); }
+  function ticketDateKey(t2){ const d=new Date(t2.sentAt); return isNaN(d.getTime())?null:dateKeyET(d); }
   function multisetEqual(a,b){ if(a.length!==b.length) return false; return a.split('').sort().join('')===b.split('').sort().join(''); }
   function wildcardMatches(p,r){ if(!p||!r||p.length!==r.length) return false; for(let i=0;i<p.length;i++){ if(p[i]!=='X'&&p[i]!==r[i]) return false; } return true; }
   function scoreBet(number,day){
-    const t=classify(number), mult=multiplierOf(number); if(!mult) return{status:'invalid',mult:0}; if(!day) return{status:'pending',mult};
+    const t2=classify(number), mult=multiplierOf(number); if(!mult) return{status:'invalid',mult:0}; if(!day) return{status:'pending',mult};
     let won=false, has=false;
-    if(t.type==='straight'||t.type==='box'){ const len=t.digits.length;
-      if(len===2){ const rs=[day.r1,day.r2,day.r3].filter(Boolean); has=rs.length>0; if(has) won=t.type==='straight'?rs.some(r=>r===t.digits):rs.some(r=>multisetEqual(r,t.digits)); }
-      else if(len===3){ const r=day.pick3; has=!!r; if(has) won=t.type==='straight'?(r===t.digits):multisetEqual(r,t.digits); }
-      else if(len===4){ const r=day.pick4; has=!!r; if(has) won=t.type==='straight'?(r===t.digits):multisetEqual(r,t.digits); }
-    } else if(t.type==='pale'){ if(day.r1&&day.r2){ has=true; won=(day.r1+day.r2===t.digits); } }
-    else if(t.type==='combo'){ if(day.r1&&day.r2){ has=true; const p=t.digits.split('x'); won=(day.r1===p[0]&&day.r2===p[1]); } }
-    else if(t.type==='pair'){ const len=number.length;
+    if(t2.type==='straight'||t2.type==='box'){ const len=t2.digits.length;
+      if(len===2){ const rs=[day.r1,day.r2,day.r3].filter(Boolean); has=rs.length>0; if(has) won=t2.type==='straight'?rs.some(r=>r===t2.digits):rs.some(r=>multisetEqual(r,t2.digits)); }
+      else if(len===3){ const r=day.pick3; has=!!r; if(has) won=t2.type==='straight'?(r===t2.digits):multisetEqual(r,t2.digits); }
+      else if(len===4){ const r=day.pick4; has=!!r; if(has) won=t2.type==='straight'?(r===t2.digits):multisetEqual(r,t2.digits); }
+    } else if(t2.type==='pale'){ if(day.r1&&day.r2){ has=true; won=(day.r1+day.r2===t2.digits); } }
+    else if(t2.type==='combo'){ if(day.r1&&day.r2){ has=true; const p=t2.digits.split('x'); won=(day.r1===p[0]&&day.r2===p[1]); } }
+    else if(t2.type==='pair'){ const len=number.length;
       if(len===2){ const rs=[day.r1,day.r2,day.r3].filter(Boolean); has=rs.length>0; if(has) won=rs.some(r=>wildcardMatches(number,r)); }
       else if(len===3){ has=!!day.pick3; if(has) won=wildcardMatches(number,day.pick3); }
       else if(len===4){ has=!!day.pick4; if(has) won=wildcardMatches(number,day.pick4); }
@@ -1169,11 +1619,11 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
   function initSalesDates(){ if(!$('fecha1xx').value) $('fecha1xx').value=todayISO(); if(!$('fecha2xx').value) $('fecha2xx').value=todayISO(); }
   function runSalesReport(){
     const from=$('fecha1xx').value, to=$('fecha2xx').value;
-    if(!from||!to){ showToast('Pick a date range','err'); return; }
-    if(from>to){ showToast('Start date is after end date','err'); return; }
+    if(!from||!to){ showToast(t('toastPickDateRange'),'err'); return; }
+    if(from>to){ showToast(t('toastStartAfterEnd'),'err'); return; }
     const all=loadTickets();
-    const range=all.filter(t=>{ const k=ticketDateKey(t); return k&&k>=from&&k<=to; });
-    const active=range.filter(t=>!t.voided&&!t.cancelled).map(t=>({t,s:scoreTicket(t)}));
+    const range=all.filter(t2=>{ const k=ticketDateKey(t2); return k&&k>=from&&k<=to; });
+    const active=range.filter(t2=>!t2.voided&&!t2.cancelled).map(t2=>({t:t2,s:scoreTicket(t2)}));
     const unpaid=active.filter(x=>!x.t.paid);
     const pendingCount=unpaid.length, pendingPay=+unpaid.reduce((s,x)=>s+(x.t.stake||0),0).toFixed(2);
     const totalTickets=active.length, totalSales=+active.reduce((s,x)=>s+(x.t.stake||0),0).toFixed(2);
@@ -1191,9 +1641,9 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
     $('rpt_prizesWeb').textContent=money2(0); $('rpt_comm').textContent=money2(0);
     $('rpt_commWeb').textContent=money2(0); $('rpt_discount').textContent=money2(0);
     $('rpt_profits').textContent=money2(profits);
-    const rows=[]; active.forEach(({t,s})=>{ s.winRows.forEach(w=>rows.push({t,w})); });
-    if(!rows.length){ $('rpt_winnerBody').innerHTML='<tr><td colspan="4" class="no-records">No records were found.</td></tr>'; }
-    else { $('rpt_winnerBody').innerHTML=rows.map(({t,w})=>'<tr><td>'+escapeHtml(t.code)+'</td><td>'+escapeHtml(w.lottery)+'<br>'+fmtNum(w.number)+'</td><td>'+money(w.prize)+'</td><td>'+(t.paid?'PAID':'UNPAID')+'</td></tr>').join(''); }
+    const rows=[]; active.forEach(({t:t2,s})=>{ s.winRows.forEach(w=>rows.push({t:t2,w})); });
+    if(!rows.length){ $('rpt_winnerBody').innerHTML='<tr><td colspan="4" class="no-records">'+escapeHtml(t('noRecords'))+'</td></tr>'; }
+    else { $('rpt_winnerBody').innerHTML=rows.map(({t:t2,w})=>'<tr><td>'+escapeHtml(t2.code)+'</td><td>'+escapeHtml(w.lottery)+'<br>'+fmtNum(w.number)+'</td><td>'+money(w.prize)+'</td><td>'+(t2.paid?'PAID':'UNPAID')+'</td></tr>').join(''); }
   }
   function initResultsDate(){ if(!$('results_date').value) $('results_date').value=todayISO(); }
   function rowIsComplete(date,name){ const r=getDayResults(date)[name]||{}; return RESULT_FIELDS.every(f=>r[f.key]&&r[f.key].length===f.max); }
@@ -1213,7 +1663,7 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
     });
   }
   function runResults(){
-    const date=$('results_date').value; if(!date){ showToast('Pick a date','err'); return; }
+    const date=$('results_date').value; if(!date){ showToast(t('toastPickDate'),'err'); return; }
     const body=$('tbl_res_body'), day=getDayResults(date);
     const ordered=LOTTERIES.map((l,i)=>({l,i})).sort((a,b)=>(a.l.period==='AM'?0:1)-(b.l.period==='AM'?0:1)||a.i-b.i).map(x=>x.l);
     body.innerHTML=ordered.map(l=>{
@@ -1228,31 +1678,31 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
   function openTicketPay(){ $('ticketPagar').value=''; const r=$('searchResult'); r.innerHTML=''; r.style.display='none'; openModal('ticketPayModal'); setTimeout(()=>{ try{ $('ticketPagar').focus(); }catch(e){} },240); }
   function findTicketByCode(raw){
     const n=String(raw||'').trim().toUpperCase().replace(/[^A-Z0-9]/g,''); if(!n) return null;
-    const all=loadTickets(); let hit=all.find(t=>(t.code||'').toUpperCase()===n); if(hit) return hit;
-    if(!/^T/.test(n)) hit=all.find(t=>(t.code||'').toUpperCase()==='T'+n); return hit||null;
+    const all=loadTickets(); let hit=all.find(t2=>(t2.code||'').toUpperCase()===n); if(hit) return hit;
+    if(!/^T/.test(n)) hit=all.find(t2=>(t2.code||'').toUpperCase()==='T'+n); return hit||null;
   }
-  function searchTicketPayment(){ const raw=($('ticketPagar').value||'').trim(); const r=$('searchResult'); if(!raw){ showToast('Enter a ticket code','err'); r.style.display='none'; return; } const t=findTicketByCode(raw); if(!t){ r.innerHTML='<div class="tp-empty">No ticket found for <b>'+escapeHtml(raw.toUpperCase())+'</b></div>'; r.style.display='block'; showToast('Ticket not found','err'); return; } renderTicketPaymentResult(t); }
-  function renderTicketPaymentResult(t){
-    const res=$('searchResult'), paid=!!t.paid, voided=!!t.voided||!!t.cancelled;
-    const gm=new Map(); (t.bets||[]).forEach(b=>{ if(!gm.has(b.lottery)) gm.set(b.lottery,[]); gm.get(b.lottery).push(b); });
-    const s=scoreTicket(t), won=s.prize>0, lost=s.prize===0&&s.pending===0;
-    let bc='pending', bt='PENDING';
-    if(t.cancelled){ bc='void'; bt='CANCELLED'; } else if(voided){ bc='void'; bt='VOID'; } else if(paid){ bc='paid'; bt='PAID'; } else if(won){ bc='paid'; bt='WINNER'; } else if(lost){ bc='void'; bt='LOSER'; }
-    let html='<div class="tp-status-bar"><span class="tp-code">'+escapeHtml(t.code)+'</span><span class="tp-badge '+bc+'">'+bt+'</span></div>';
-    html+='<div class="tp-meta">Sent: '+fmtIsoShort(t.sentAt)+'</div>';
-    gm.forEach((bets,lottery)=>{ const sub=+bets.reduce((s,b)=>s+b.amount,0).toFixed(2); const sw=computeMaxWin(bets); html+='<div class="tp-group"><div class="tp-group-head"><span class="dot" style="background:'+lotColor(lottery)+'"></span><span class="tp-gname">'+escapeHtml(lottery)+'</span><span class="tp-gsum">'+money(sub)+' · '+payoutFmt(sw)+'</span></div>'; bets.forEach(b=>{ html+='<div class="tp-row"><span class="tp-num">'+fmtNum(b.number)+'</span><span class="tp-amt">'+money(b.amount)+'</span><span class="tp-pay">'+payoutFmt(payoutOf(b))+'</span></div>'; }); html+='</div>'; });
-    html+='<div class="tp-total"><span>STAKED</span><span class="tp-total-val">'+money(t.stake||0)+'</span></div>';
-    html+='<div class="tp-total"><span>MAX WIN</span><span class="tp-total-win">'+payoutFmt(computeMaxWin(t.bets))+'</span></div>';
-    if(t.cancelled){ html+='<div class="tp-void-note">✕ CANCELLED'+(t.cancelledAt?' on '+fmtIsoShort(t.cancelledAt):'')+'</div>'; }
-    else if(voided){ html+='<div class="tp-void-note">✕ Voided'+(t.voidedAt?' on '+fmtIsoShort(t.voidedAt):'')+'</div>'; }
-    else if(paid){ html+='<div class="tp-paid-note">✓ Paid'+(t.paidAt?' on '+fmtIsoShort(t.paidAt):'')+'</div>'; }
-    else { if(won) html+='<div class="tp-paid-note" style="background:rgba(34,197,94,.15);border-color:#22c55e;color:#4ade80;margin-bottom:0">🎉 WINNER! Prize: '+money(s.prize)+'</div>'; html+='<div class="tp-actions"><button type="button" class="tp-confirm" data-code="'+escapeHtml(t.code)+'">CONFIRM PAYMENT</button><button type="button" class="tp-void" data-code="'+escapeHtml(t.code)+'">VOID</button></div>'; }
+  function searchTicketPayment(){ const raw=($('ticketPagar').value||'').trim(); const r=$('searchResult'); if(!raw){ showToast(t('toastEnterCode'),'err'); r.style.display='none'; return; } const t2=findTicketByCode(raw); if(!t2){ r.innerHTML='<div class="tp-empty">'+escapeHtml(t('toastTicketNotFound'))+' <b>'+escapeHtml(raw.toUpperCase())+'</b></div>'; r.style.display='block'; showToast(t('toastTicketNotFound'),'err'); return; } renderTicketPaymentResult(t2); }
+  function renderTicketPaymentResult(t2){
+    const res=$('searchResult'), paid=!!t2.paid, voided=!!t2.voided||!!t2.cancelled;
+    const gm=new Map(); (t2.bets||[]).forEach(b=>{ if(!gm.has(b.lottery)) gm.set(b.lottery,[]); gm.get(b.lottery).push(b); });
+    const s=scoreTicket(t2), won=s.prize>0, lost=s.prize===0&&s.pending===0;
+    let bc='pending', bt=t('stPending');
+    if(t2.cancelled){ bc='void'; bt=t('stCancelled'); } else if(voided){ bc='void'; bt=t('stVoid'); } else if(paid){ bc='paid'; bt=t('stPaid'); } else if(won){ bc='paid'; bt=t('stWinner'); } else if(lost){ bc='void'; bt=t('stLoser'); }
+    let html='<div class="tp-status-bar"><span class="tp-code">'+escapeHtml(t2.code)+'</span><span class="tp-badge '+bc+'">'+escapeHtml(bt)+'</span></div>';
+    html+='<div class="tp-meta">'+escapeHtml(t('ticketSentMeta',{d:fmtIsoShort(t2.sentAt)}))+'</div>';
+    gm.forEach((bets,lottery)=>{ const sub=+bets.reduce((s2,b)=>s2+b.amount,0).toFixed(2); const sw=computeMaxWin(bets); html+='<div class="tp-group"><div class="tp-group-head"><span class="dot" style="background:'+lotColor(lottery)+'"></span><span class="tp-gname">'+escapeHtml(lottery)+'</span><span class="tp-gsum">'+money(sub)+' · '+payoutFmt(sw)+'</span></div>'; bets.forEach(b=>{ html+='<div class="tp-row"><span class="tp-num">'+fmtNum(b.number)+'</span><span class="tp-amt">'+money(b.amount)+'</span><span class="tp-pay">'+payoutFmt(payoutOf(b))+'</span></div>'; }); html+='</div>'; });
+    html+='<div class="tp-total"><span>'+escapeHtml(t('staked'))+'</span><span class="tp-total-val">'+money(t2.stake||0)+'</span></div>';
+    html+='<div class="tp-total"><span>'+escapeHtml(t('maxWinLabel'))+'</span><span class="tp-total-win">'+payoutFmt(computeMaxWin(t2.bets))+'</span></div>';
+    if(t2.cancelled){ html+='<div class="tp-void-note">'+t('cancelledOn',{d:fmtIsoShort(t2.cancelledAt)})+'</div>'; }
+    else if(voided){ html+='<div class="tp-void-note">'+t('voidedOn',{d:fmtIsoShort(t2.voidedAt)})+'</div>'; }
+    else if(paid){ html+='<div class="tp-paid-note">'+t('paidOn',{d:fmtIsoShort(t2.paidAt)})+'</div>'; }
+    else { if(won) html+='<div class="tp-paid-note" style="background:rgba(34,197,94,.15);border-color:#22c55e;color:#4ade80;margin-bottom:0">'+t('winnerPrizeNote',{p:money(s.prize)})+'</div>'; html+='<div class="tp-actions"><button type="button" class="tp-confirm" data-code="'+escapeHtml(t2.code)+'">'+escapeHtml(t('confirmPaymentBtn'))+'</button><button type="button" class="tp-void" data-code="'+escapeHtml(t2.code)+'">'+escapeHtml(t('voidBtn'))+'</button></div>'; }
     res.innerHTML=html; res.style.display='block';
     const cb=res.querySelector('.tp-confirm'); if(cb) cb.addEventListener('click',()=>confirmTicketPayment(cb.getAttribute('data-code')));
     const vb=res.querySelector('.tp-void'); if(vb) vb.addEventListener('click',()=>voidTicket(vb.getAttribute('data-code')));
   }
-  async function confirmTicketPayment(code){ const t=findTicketByCode(code); if(!t){ showToast('Ticket not found','err'); return; } if(t.cancelled){ showToast('Ticket is cancelled','err'); return; } if(t.voided){ showToast('Ticket is void','err'); return; } if(t.paid){ showToast('Already paid','ok'); return; } t.paid=true; t.paidAt=new Date().toISOString(); try{ await store.commit(); }catch(e){ showToast('Could not save payment','err'); return; } showToast('Ticket paid','ok'); renderTicketPaymentResult(t); refreshTicketOptionsIfOpen(t.code); refreshOpenCount(); }
-  async function voidTicket(code){ const t=findTicketByCode(code); if(!t){ showToast('Ticket not found','err'); return; } if(t.paid){ showToast('Cannot void a paid ticket','err'); return; } if(t.voided){ showToast('Already void','ok'); return; } t.voided=true; t.voidedAt=new Date().toISOString(); try{ await store.commit(); }catch(e){ showToast('Could not void ticket','err'); return; } showToast('Ticket voided','ok'); renderTicketPaymentResult(t); refreshTicketOptionsIfOpen(t.code); refreshOpenCount(); }
+  async function confirmTicketPayment(code){ const t2=findTicketByCode(code); if(!t2){ showToast(t('toastTicketNotFound'),'err'); return; } if(t2.cancelled){ showToast(t('toastTicketIsCancelled'),'err'); return; } if(t2.voided){ showToast(t('toastTicketIsVoid'),'err'); return; } if(t2.paid){ showToast(t('toastAlreadyPaid'),'ok'); return; } t2.paid=true; t2.paidAt=new Date().toISOString(); try{ await store.commit(); }catch(e){ showToast(t('toastCouldNotPay'),'err'); return; } showToast(t('toastTicketPaid'),'ok'); renderTicketPaymentResult(t2); refreshTicketOptionsIfOpen(t2.code); refreshOpenCount(); }
+  async function voidTicket(code){ const t2=findTicketByCode(code); if(!t2){ showToast(t('toastTicketNotFound'),'err'); return; } if(t2.paid){ showToast(t('toastCannotVoidPaid'),'err'); return; } if(t2.voided){ showToast(t('toastAlreadyVoid'),'ok'); return; } t2.voided=true; t2.voidedAt=new Date().toISOString(); try{ await store.commit(); }catch(e){ showToast(t('toastCouldNotVoid'),'err'); return; } showToast(t('toastTicketVoided'),'ok'); renderTicketPaymentResult(t2); refreshTicketOptionsIfOpen(t2.code); refreshOpenCount(); }
 
   let ticketOptionsTimer=null;
   function startTicketOptionsTimer(){ stopTicketOptionsTimer(); updateCancelButtonState(); ticketOptionsTimer=setInterval(updateTicketOptionsCooldown,1000); }
@@ -1261,60 +1711,60 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
   function updateCancelButtonState(){
     const sel=$('ticketSelect'), btn=$('btnTicketCancel'), label=$('btnTicketCancelLabel'), note=$('cancelCooldownNote');
     if(!btn||!sel) return;
-    const code=sel.value, t=code?findTicketByCode(code):null;
-    if(!t){ btn.disabled=true; if(label) label.textContent='Cancel'; if(note) note.style.display='none'; return; }
-    if(t.paid){ btn.disabled=true; if(label) label.textContent='Paid'; if(note){ note.style.display='block'; note.className='cooldown-note blocked'; note.innerHTML='<i class="fas fa-lock"></i> Paid tickets cannot be cancelled.'; } return; }
-    if(t.cancelled){ btn.disabled=true; if(label) label.textContent='Cancelled'; if(note){ note.style.display='block'; note.className='cooldown-note blocked'; note.innerHTML='<i class="fas fa-ban"></i> Ticket is cancelled.'; } return; }
-    const rem=cancelWindowRemaining(t);
-    if(rem>0){ btn.disabled=false; if(label) label.textContent='Cancel'; if(note){ note.style.display='block'; note.className='cooldown-note ready'; note.innerHTML='<i class="fas fa-clock"></i> <b>'+fmtMmSs(rem)+'</b> left to cancel<br><span style="opacity:.75;font-size:9px;">Window closes 1 min after sale</span>'; } }
-    else { btn.disabled=true; if(label) label.textContent='Locked'; if(note){ note.style.display='block'; note.className='cooldown-note blocked'; note.innerHTML='<i class="fas fa-lock"></i> Cancel window expired<br><span style="opacity:.75;font-size:9px;">1-minute window after sale</span>'; } }
+    const code=sel.value, t2=code?findTicketByCode(code):null;
+    if(!t2){ btn.disabled=true; if(label) label.textContent=t('cancel'); if(note) note.style.display='none'; return; }
+    if(t2.paid){ btn.disabled=true; if(label) label.textContent=t('stPaid'); if(note){ note.style.display='block'; note.className='cooldown-note blocked'; note.innerHTML='<i class="fas fa-lock"></i> '+escapeHtml(t('cdLockedPaid')); } return; }
+    if(t2.cancelled){ btn.disabled=true; if(label) label.textContent=t('stCancelled'); if(note){ note.style.display='block'; note.className='cooldown-note blocked'; note.innerHTML='<i class="fas fa-ban"></i> '+escapeHtml(t('cdTicketCancelled')); } return; }
+    const rem=cancelWindowRemaining(t2);
+    if(rem>0){ btn.disabled=false; if(label) label.textContent=t('cancel'); if(note){ note.style.display='block'; note.className='cooldown-note ready'; note.innerHTML='<i class="fas fa-clock"></i> '+t('cdLeftToCancel',{t:fmtMmSs(rem)}); } }
+    else { btn.disabled=true; if(label) label.textContent=t('cdLocked'); if(note){ note.style.display='block'; note.className='cooldown-note blocked'; note.innerHTML='<i class="fas fa-lock"></i> '+t('cdWindowExpired'); } }
   }
-  function fmtTicketOption(t){ let f='OPEN'; if(t.cancelled) f='CANCELLED'; else if(t.voided) f='VOID'; else if(t.paid) f='PAID'; else { const s=scoreTicket(t); if(s.prize>0) f='WINNER ('+money(s.prize)+')'; else if(s.pending===0&&s.invalid===0) f='LOSER'; else f='PENDING'; } return t.code+'  ·  '+fmtIsoShort(t.sentAt)+'  ·  '+money(t.stake||0)+'  ·  '+f; }
-  function refreshTicketOptionsSelect(preserve){ const sel=$('ticketSelect'); if(!sel) return; const tk=loadTickets().slice().sort((a,b)=>{ const rk=t=>(t.cancelled||t.voided?2:(t.paid?1:0)); const ra=rk(a), rb=rk(b); if(ra!==rb) return ra-rb; return (new Date(b.sentAt).getTime()||0)-(new Date(a.sentAt).getTime()||0); }); const prev=preserve||(sel.value||''); if(!tk.length){ sel.innerHTML='<option value="">No tickets yet.</option>'; sel.disabled=true; toggleTicketOptionsButtons(false); return; } sel.disabled=false; sel.innerHTML=tk.map(t=>'<option value="'+escapeHtml(t.code)+'">'+escapeHtml(fmtTicketOption(t))+'</option>').join(''); sel.value=tk.some(t=>t.code===prev)?prev:tk[0].code; updateCancelButtonState(); }
+  function fmtTicketOption(t2){ let f=t('openShort'); if(t2.cancelled) f=t('stCancelled'); else if(t2.voided) f=t('stVoid'); else if(t2.paid) f=t('stPaid'); else { const s=scoreTicket(t2); if(s.prize>0) f=t('statusWinnerPrize',{p:money(s.prize)}); else if(s.pending===0&&s.invalid===0) f=t('stLoser'); else f=t('stPending'); } return t2.code+'  ·  '+fmtIsoShort(t2.sentAt)+'  ·  '+money(t2.stake||0)+'  ·  '+f; }
+  function refreshTicketOptionsSelect(preserve){ const sel=$('ticketSelect'); if(!sel) return; const tk=loadTickets().slice().sort((a,b)=>{ const rk=t2=>(t2.cancelled||t2.voided?2:(t2.paid?1:0)); const ra=rk(a), rb=rk(b); if(ra!==rb) return ra-rb; return (new Date(b.sentAt).getTime()||0)-(new Date(a.sentAt).getTime()||0); }); const prev=preserve||(sel.value||''); if(!tk.length){ sel.innerHTML='<option value="">'+escapeHtml(t('noTicketsYet'))+'</option>'; sel.disabled=true; toggleTicketOptionsButtons(false); return; } sel.disabled=false; sel.innerHTML=tk.map(t2=>'<option value="'+escapeHtml(t2.code)+'">'+escapeHtml(fmtTicketOption(t2))+'</option>').join(''); sel.value=tk.some(t2=>t2.code===prev)?prev:tk[0].code; updateCancelButtonState(); }
   function toggleTicketOptionsButtons(on){ ['btnTicketPrint','btnTicketShow'].forEach(id=>{ const b=$(id); if(b) b.disabled=!on; }); updateCancelButtonState(); }
   function renderTicketOptionsPreview(code){
     const box=$('ticketOptionsPreview'); if(!box) return;
-    const t=code?findTicketByCode(code):null; if(!t){ box.innerHTML='<div class="tp-empty">Select a ticket to preview.</div>'; box.style.display='block'; return; }
-    const paid=!!t.paid, voided=!!t.voided||!!t.cancelled, s=scoreTicket(t), won=s.prize>0;
-    let bc='pending', bt='PENDING';
-    if(t.cancelled){ bc='void'; bt='CANCELLED'; } else if(voided){ bc='void'; bt='VOID'; } else if(paid){ bc='paid'; bt='PAID'; } else if(won){ bc='paid'; bt='WINNER'; }
-    let html='<div class="tp-status-bar"><span class="tp-code">'+escapeHtml(t.code)+'</span><span class="tp-badge '+bc+'">'+bt+'</span></div>';
-    html+='<div class="tp-meta">Sent: '+fmtIsoShort(t.sentAt)+'</div>';
-    html+=receiptWrap(buildTicketReceipt({code:t.code,sentAt:t.sentAt,bets:t.bets,stake:t.stake||0,cancelled:t.cancelled}));
-    if(t.cancelled){ html+='<div class="tp-void-note">✕ CANCELLED'+(t.cancelledAt?' on '+fmtIsoShort(t.cancelledAt):'')+'</div>'; }
-    else if(voided){ html+='<div class="tp-void-note">✕ Voided'+(t.voidedAt?' on '+fmtIsoShort(t.voidedAt):'')+'</div>'; }
-    else if(paid){ html+='<div class="tp-paid-note">✓ Paid'+(t.paidAt?' on '+fmtIsoShort(t.paidAt):'')+'</div>'; }
-    else if(won){ html+='<div class="tp-paid-note" style="background:rgba(34,197,94,.15);border-color:#22c55e;color:#4ade80">🎉 WINNER! Prize: '+money(s.prize)+'</div>'; }
+    const t2=code?findTicketByCode(code):null; if(!t2){ box.innerHTML='<div class="tp-empty">'+escapeHtml(t('selectTicketPreview'))+'</div>'; box.style.display='block'; return; }
+    const paid=!!t2.paid, voided=!!t2.voided||!!t2.cancelled, s=scoreTicket(t2), won=s.prize>0;
+    let bc='pending', bt=t('stPending');
+    if(t2.cancelled){ bc='void'; bt=t('stCancelled'); } else if(voided){ bc='void'; bt=t('stVoid'); } else if(paid){ bc='paid'; bt=t('stPaid'); } else if(won){ bc='paid'; bt=t('stWinner'); }
+    let html='<div class="tp-status-bar"><span class="tp-code">'+escapeHtml(t2.code)+'</span><span class="tp-badge '+bc+'">'+escapeHtml(bt)+'</span></div>';
+    html+='<div class="tp-meta">'+escapeHtml(t('ticketSentMeta',{d:fmtIsoShort(t2.sentAt)}))+'</div>';
+    html+=receiptWrap(buildTicketReceipt({code:t2.code,sentAt:t2.sentAt,bets:t2.bets,stake:t2.stake||0,cancelled:t2.cancelled}));
+    if(t2.cancelled){ html+='<div class="tp-void-note">'+t('cancelledOn',{d:fmtIsoShort(t2.cancelledAt)})+'</div>'; }
+    else if(voided){ html+='<div class="tp-void-note">'+t('voidedOn',{d:fmtIsoShort(t2.voidedAt)})+'</div>'; }
+    else if(paid){ html+='<div class="tp-paid-note">'+t('paidOn',{d:fmtIsoShort(t2.paidAt)})+'</div>'; }
+    else if(won){ html+='<div class="tp-paid-note" style="background:rgba(34,197,94,.15);border-color:#22c55e;color:#4ade80">'+t('winnerPrizeNote',{p:money(s.prize)})+'</div>'; }
     box.innerHTML=html; box.style.display='block';
   }
   function openTicketsOptions(){ refreshTicketOptionsSelect(''); toggleTicketOptionsButtons(!!$('ticketSelect').value); const b=$('ticketOptionsPreview'); b.innerHTML=''; b.style.display='none'; openModal('ticketsOptionsModal'); startTicketOptionsTimer(); }
   function onTicketSelectChange(){ toggleTicketOptionsButtons(!!$('ticketSelect').value); const b=$('ticketOptionsPreview'); if(b&&b.style.display!=='none') renderTicketOptionsPreview($('ticketSelect').value); }
   async function cancelTicketByCode(code){
     const n=String(code||'').trim().toUpperCase(); if(!n) return{ok:false,reason:'not-found'};
-    const tk=loadTickets(), idx=tk.findIndex(t=>(t.code||'').toUpperCase()===n); if(idx<0) return{ok:false,reason:'not-found'};
-    const t=tk[idx]; if(t.paid) return{ok:false,reason:'paid'}; if(t.cancelled) return{ok:false,reason:'cancelled'}; if(cancelWindowRemaining(t)<=0) return{ok:false,reason:'expired'};
-    t.cancelled=true; t.voided=true; t.cancelledAt=new Date().toISOString();
+    const tk=loadTickets(), idx=tk.findIndex(t2=>(t2.code||'').toUpperCase()===n); if(idx<0) return{ok:false,reason:'not-found'};
+    const t2=tk[idx]; if(t2.paid) return{ok:false,reason:'paid'}; if(t2.cancelled) return{ok:false,reason:'cancelled'}; if(cancelWindowRemaining(t2)<=0) return{ok:false,reason:'expired'};
+    t2.cancelled=true; t2.voided=true; t2.cancelledAt=new Date().toISOString();
     try{ await store.setTickets(tk); }catch(e){ return{ok:false,reason:'save'}; }
-    return{ok:true,ticket:t};
+    return{ok:true,ticket:t2};
   }
-  function cancelSelectedTicket(){ const code=$('ticketSelect').value; if(!code){ showToast('No ticket selected','err'); return; } const t=findTicketByCode(code); if(!t){ showToast('Ticket not found','err'); return; } if(t.paid){ showToast('Paid tickets cannot be cancelled','err'); return; } if(t.cancelled){ showToast('Ticket already cancelled','err'); return; } const rem=cancelWindowRemaining(t); if(rem<=0){ showToast('Cancel window expired (1 min)','err'); return; } state._pendingCancelCode=code; $('confirmCancelCode').textContent=code; $('confirmCancelTime').textContent=fmtMmSs(rem); openModal('confirmCancelModal'); }
+  function cancelSelectedTicket(){ const code=$('ticketSelect').value; if(!code){ showToast(t('toastNoTicketSelected'),'err'); return; } const t2=findTicketByCode(code); if(!t2){ showToast(t('toastTicketNotFound'),'err'); return; } if(t2.paid){ showToast(t('toastPaidCannotCancel'),'err'); return; } if(t2.cancelled){ showToast(t('toastAlreadyCancelled'),'err'); return; } const rem=cancelWindowRemaining(t2); if(rem<=0){ showToast(t('toastWindowExpired'),'err'); return; } state._pendingCancelCode=code; $('confirmCancelCode').textContent=code; $('confirmCancelTime').textContent=fmtMmSs(rem); openModal('confirmCancelModal'); }
   async function executeCancelTicket(){
     const code=state._pendingCancelCode; if(!code) return;
     const res=await cancelTicketByCode(code); closeModal('confirmCancelModal');
-    if(!res.ok){ if(res.reason==='expired') showToast('Cancel window expired','err'); else if(res.reason==='paid') showToast('Paid tickets cannot be cancelled','err'); else if(res.reason==='cancelled') showToast('Ticket already cancelled','err'); else if(res.reason==='not-found') showToast('Ticket not found','err'); else showToast('Could not cancel ticket','err'); return; }
-    showToast('Ticket cancelled','ok'); closeModal('ticketsOptionsModal'); refreshOpenCount(); showCancelledTicketSheet(res.ticket);
+    if(!res.ok){ if(res.reason==='expired') showToast(t('toastCancelExpired'),'err'); else if(res.reason==='paid') showToast(t('toastCancelPaid'),'err'); else if(res.reason==='cancelled') showToast(t('toastAlreadyCancelled'),'err'); else if(res.reason==='not-found') showToast(t('toastTicketNotFound'),'err'); else showToast(t('toastCouldNotCancel'),'err'); return; }
+    showToast(t('toastTicketCancelled'),'ok'); closeModal('ticketsOptionsModal'); refreshOpenCount(); showCancelledTicketSheet(res.ticket);
   }
   function refreshTicketOptionsIfOpen(preferred){ const m=$('ticketsOptionsModal'); if(!m||!m.classList.contains('open')) return; refreshTicketOptionsSelect(preferred||$('ticketSelect').value); const b=$('ticketOptionsPreview'); if(b&&b.style.display!=='none') renderTicketOptionsPreview($('ticketSelect').value); }
-  function showCancelledTicketSheet(t){ state._cancelledTicket=t; $('cancelledTicketBody').innerHTML=receiptWrap(buildTicketReceipt({code:t.code,sentAt:t.sentAt,bets:t.bets,stake:t.stake||0,cancelled:true})); $('cancelledTicketHead').textContent='Ticket Cancelled · '+t.code; const s=store.getMeta(PHONE_KEY); $('cancelledTicketPhone').value=s||''; $('cancelledTicketSheet').classList.add('open'); $('backdrop').classList.add('show'); }
+  function showCancelledTicketSheet(t2){ state._cancelledTicket=t2; $('cancelledTicketBody').innerHTML=receiptWrap(buildTicketReceipt({code:t2.code,sentAt:t2.sentAt,bets:t2.bets,stake:t2.stake||0,cancelled:true})); $('cancelledTicketHead').textContent=t('ticketCancelled')+' · '+t2.code; const s=store.getMeta(PHONE_KEY); $('cancelledTicketPhone').value=s||''; $('cancelledTicketSheet').classList.add('open'); $('backdrop').classList.add('show'); }
   function closeCancelledTicketSheet(){ $('cancelledTicketSheet').classList.remove('open'); $('backdrop').classList.remove('show'); state._cancelledTicket=null; }
-  function printCancelledTicket(){ if(!state._cancelledTicket) return; const t=state._cancelledTicket; printReceiptHtml(receiptWrap(buildTicketReceipt({code:t.code,sentAt:t.sentAt,bets:t.bets,stake:t.stake||0,cancelled:true}))); }
-  function sendCancelledTicketToSeller(){ if(!state._cancelledTicket) return; const p=($('cancelledTicketPhone').value||'').replace(/\D/g,''); if(!p||p.length<7){ showToast('Enter a valid WhatsApp number','err'); $('cancelledTicketPhone').focus(); return; } savePhone(p); const text=buildReceiptText(state._cancelledTicket); const url='https://wa.me/'+p+'?text='+encodeURIComponent(text); const w=window.open(url,'_blank'); if(!w) window.location.href=url; showToast('Opening WhatsApp…','ok'); }
+  function printCancelledTicket(){ if(!state._cancelledTicket) return; const t2=state._cancelledTicket; printReceiptHtml(receiptWrap(buildTicketReceipt({code:t2.code,sentAt:t2.sentAt,bets:t2.bets,stake:t2.stake||0,cancelled:true}))); }
+  function sendCancelledTicketToSeller(){ if(!state._cancelledTicket) return; const p=($('cancelledTicketPhone').value||'').replace(/\D/g,''); if(!p||p.length<7){ showToast(t('toastEnterValidPhone'),'err'); $('cancelledTicketPhone').focus(); return; } savePhone(p); const text=buildReceiptText(state._cancelledTicket); const url='https://wa.me/'+p+'?text='+encodeURIComponent(text); const w=window.open(url,'_blank'); if(!w) window.location.href=url; showToast(t('toastOpeningWhatsApp'),'ok'); }
 
   async function fetchNYResults(){ const u='https://data.ny.gov/resource/hsys-3def.json?$order=draw_date%20DESC&$limit=2'; const r=await fetch(u,{cache:'no-store'}); if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }
   function updateSyncStatus(text,cls){ const el=$('syncStatus'); if(!el) return; el.textContent=text||''; el.className='sync-status'+(cls?' '+cls:''); el.style.display=text?'block':'none'; }
   async function syncNYResults(show){
     try{
-      if(show) showToast('Fetching NY Lottery results…','ok');
+      if(show) showToast(t('toastFetchNY'),'ok');
       const rows=await fetchNYResults(); if(!rows||!rows.length) throw new Error('No data returned');
       const today=todayISO(), yMs=Date.now()-24*60*60*1000, yest=dateKeyET(new Date(yMs));
       rows.forEach(row=>{
@@ -1327,7 +1777,7 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
       state.syncFailures=0;
       store.setMeta(SYNC_META_KEY,JSON.stringify({lastOk:new Date().toISOString(),lastDate:rows[0]?.draw_date?.split('T')[0]||null}));
       updateSyncStatus('NY synced · '+(rows[0]?.draw_date?.split('T')[0]||'—'),'ok');
-      if(show) showToast('NY results updated','ok');
+      if(show) showToast(t('toastNYUpdated'),'ok');
       if($('resultsModal').classList.contains('open')) runResults();
       return true;
     }catch(err){
@@ -1335,46 +1785,31 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
       const reason=err.name==='TypeError'?'Network/CORS blocked — check internet or open via https://':(err.message||'Sync failed');
       console.warn('[NY Sync] Failed:',err);
       updateSyncStatus('NY sync unavailable · '+reason,'err');
-      if(show) showToast('NY sync failed: '+reason,'err');
+      if(show) showToast(t('toastNYFailed',{r:reason}),'err');
       return false;
     }
   }
   function startAutoSync(){ syncNYResults(false); if(state.syncTimer) clearInterval(state.syncTimer); state.syncTimer=setInterval(()=>{ if(state.syncFailures>=SYNC_MAX_FAILURES) return; if(document.hidden) return; syncNYResults(false); },SYNC_INTERVAL_MS); }
 
-  /* ===== FALLBACK INLINE MONITOR (used when popup is blocked) ===== */
+  /* ===== FALLBACK INLINE MONITOR ===== */
   const MONITOR_LOTTERIES=[{name:'CONNECT AM',code:'CT-AM',color:'#22c55e',draw:'13:37'},{name:'CONNECT PM',code:'CT-PM',color:'#1d4ed8',draw:'22:09'},{name:'FLORIDA AM',code:'FL-AM',color:'#f97316',draw:'13:26'},{name:'FLORIDA PM',code:'FL-PM',color:'#f59e0b',draw:'21:40'},{name:'FL PICK2 AM',code:'FLPK2AM',color:'#ea580c',draw:'13:25'},{name:'FL PICK 2 PM',code:'FLPK2PM',color:'#2563eb',draw:'21:40'},{name:'GEORGIA EVENING',code:'GE-EV',color:'#1e3a8a',draw:'18:54'},{name:'GEORGIA MIDDAY',code:'GE-MD',color:'#3b82f6',draw:'12:26'},{name:'GEORGIA NIGHT',code:'GE-NT',color:'#8b5cf6',draw:'23:14'},{name:'ILLINOIS EVENING',code:'ILLINOIS-EVEN',color:'#fef08a',draw:'22:05'},{name:'ILLINOIS MIDDAY',code:'ILLINOIS-MD',color:'#fb923c',draw:'13:25'},{name:'MARYLAND AM',code:'MD-AM',color:'#4f46e5',draw:'12:13'},{name:'MARYLAND PM',code:'MD-PM',color:'#d8b4fe',draw:'19:41'},{name:'NEW JERSEY AM',code:'NJ-AM',color:'#84cc16',draw:'12:54'},{name:'NEW JERSEY PM',code:'NJ-PM',color:'#bef264',draw:'22:52'},{name:'NEW YORK AM',code:'NY-AM',color:'#3b82f6',draw:'14:26'},{name:'NEW YORK PM',code:'NY-PM',color:'#0ea5e9',draw:'22:25'},{name:'PENNSYLV AM',code:'PA-AM',color:'#10b981',draw:'13:05'},{name:'PENNSYLV PM',code:'PA-PM',color:'#65a30d',draw:'18:55'},{name:'TEXAS DAY',code:'TX-DAY',color:'#ec4899',draw:'13:12'},{name:'TEXAS-EVENING',code:'TX-EVEN',color:'#0ea5e9',draw:'18:45'},{name:'TEXAS MORNING',code:'TX-MORNING',color:'#d8b4fe',draw:'10:45'},{name:'TEXAS NIGHT',code:'TX-NIGHT',color:'#6366f1',draw:'22:57'}];
   let monitorTickTimer=null;
   function getMonitorNowSeconds(){ const p=_FMT_24H.formatToParts(new Date()); return (parseInt(_getPart(p,'hour'),10)%24)*3600+parseInt(_getPart(p,'minute'),10)*60+parseInt(_getPart(p,'second'),10); }
-  function getMonitorCountdown(draw){ const n=getMonitorNowSeconds(); const b=draw.split(':'); const ds=parseInt(b[0],10)*3600+parseInt(b[1],10)*60; const cs=ds-(PRE_CLOSE_MS/1000); const dd=ds-n, dc=cs-n; if(dd<=0) return{text:'DRAWN',cls:'drawn'}; if(dc<=0) return{text:'CLOSED',cls:'closed'}; const t=Math.floor(dc); const hh=Math.floor(t/3600), mm=Math.floor((t%3600)/60), ss=t%60; const txt=hh>0?hh+':'+pad2(mm)+':'+pad2(ss):pad2(mm)+':'+pad2(ss); return{text:txt,cls:dc<=15*60?'warning':'open'}; }
-  function renderMonitor(){ const tb=$('monitorBody'); if(!tb) return; const d=loadResultsAll(), k=todayISO(); let html=''; MONITOR_LOTTERIES.forEach(l=>{ const row=(d[k]||{})[l.name]||{}; const r1=row.r1||'--', r2=row.r2||'--', r3=row.r3||'--', p3=row.pick3||'---', p4=row.pick4||'----'; const cd=getMonitorCountdown(l.draw); const bl=v=>v==='--'||v==='---'||v==='----'?'monitor-empty':''; html+='<tr><td><i class="fas fa-star star-icon" style="color:'+l.color+';"></i>'+escapeHtml(l.code)+'<span class="monitor-cd '+cd.cls+'">'+cd.text+'</span></td><td class="'+bl(r1)+'">'+escapeHtml(r1)+'</td><td class="'+bl(r2)+'">'+escapeHtml(r2)+'</td><td class="'+bl(r3)+'">'+escapeHtml(r3)+'</td><td class="'+bl(p3)+'">'+escapeHtml(p3)+'</td><td class="'+bl(p4)+'">'+escapeHtml(p4)+'</td></tr>'; }); tb.innerHTML=html; }
+  function getMonitorCountdown(draw){ const n=getMonitorNowSeconds(); const b=draw.split(':'); const ds=parseInt(b[0],10)*3600+parseInt(b[1],10)*60; const cs=ds-(PRE_CLOSE_MS/1000); const dd=ds-n, dc=cs-n; if(dd<=0) return{text:t('drawn'),cls:'drawn'}; if(dc<=0) return{text:t('closed'),cls:'closed'}; const t2=Math.floor(dc); const hh=Math.floor(t2/3600), mm=Math.floor((t2%3600)/60), ss=t2%60; const txt=hh>0?hh+':'+pad2(mm)+':'+pad2(ss):pad2(mm)+':'+pad2(ss); return{text:txt,cls:dc<=15*60?'warning':'open'}; }
+  function renderMonitor(){ const tb=$('monitorBody'); if(!tb) return; const d=loadResultsAll(), k=todayISO(); let html=''; MONITOR_LOTTERIES.forEach(l=>{ const row=(d[k]||{})[l.name]||{}; const r1=row.r1||'--', r2=row.r2||'--', r3=row.r3||'--', p3=row.pick3||'---', p4=row.pick4||'----'; const cd=getMonitorCountdown(l.draw); const bl=v=>v==='--'||v==='---'||v==='----'?'monitor-empty':''; html+='<tr><td><i class="fas fa-star star-icon" style="color:'+l.color+';"></i>'+escapeHtml(l.code)+'<span class="monitor-cd '+cd.cls+'">'+escapeHtml(cd.text)+'</span></td><td class="'+bl(r1)+'">'+escapeHtml(r1)+'</td><td class="'+bl(r2)+'">'+escapeHtml(r2)+'</td><td class="'+bl(r3)+'">'+escapeHtml(r3)+'</td><td class="'+bl(p3)+'">'+escapeHtml(p3)+'</td><td class="'+bl(p4)+'">'+escapeHtml(p4)+'</td></tr>'; }); tb.innerHTML=html; }
   function updateMonitorClock(){ const el=$('monitorClock'); if(!el) return; el.textContent=fmtTimeBadgeET(new Date())+' ET'; }
   function startMonitorTicker(){ stopMonitorTicker(); renderMonitor(); updateMonitorClock(); monitorTickTimer=setInterval(()=>{ renderMonitor(); updateMonitorClock(); },1000); }
   function stopMonitorTicker(){ if(monitorTickTimer){ clearInterval(monitorTickTimer); monitorTickTimer=null; } }
   function openMonitor(){ openModal('monitorModal'); startMonitorTicker(); }
 
-  /* ===== PRIMARY: open the Live Monitor as an INDEPENDENT popup window ===== */
   function launchMonitor(){
-    // Reuse existing window if still open
     let win = window._monitorWin;
     if (win && !win.closed) { try { win.focus(); } catch (e) {} return; }
-
-    try {
-      win = window.open('', 'LiveMonitor',
-        'width=1200,height=820,menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes');
-    } catch (e) { win = null; }
-
-    if (!win) {
-      // Popup blocked → fall back to inline modal
-      showToast('Popup blocked — opening inline monitor', 'err');
-      openMonitor();
-      return;
-    }
-
+    try { win = window.open('', 'LiveMonitor', 'width=1200,height=820,menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes'); } catch (e) { win = null; }
+    if (!win) { showToast(t('toastPopupBlocked'), 'err'); openMonitor(); return; }
     window._monitorWin = win;
-
     const tpl = document.getElementById('monitorTemplate');
     const doc = win.document;
-
     doc.open();
     doc.write('<!DOCTYPE html><html><head>');
     doc.write('<meta charset="utf-8">');
@@ -1382,27 +1817,35 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
     doc.write('<title>Live Lottery Monitor</title>');
     doc.write('<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">');
     doc.write('</head><body>');
-    if (tpl && tpl.innerHTML) doc.write(tpl.innerHTML);
+    // Inject i18n object for the template's own script
+    doc.write('<script>window.__I18N=' + JSON.stringify(I18N[currentLang] || I18N.en) + ';<' + '/script>');
+    // Replace {{i18n:key}} placeholders in template HTML
+    let tplHtml = tpl.innerHTML.replace(/\{\{i18n:([a-zA-Z0-9_]+)\}\}/g, function(_, k){ return t(k); });
+    doc.write(tplHtml);
     doc.write('</body></html>');
     doc.close();
-
-    // Clean up reference when the popup closes
-    try {
-      win.addEventListener('beforeunload', function () {
-        if (window._monitorWin === win) window._monitorWin = null;
-      });
-    } catch (e) {}
+    try { win.addEventListener('beforeunload', function () { if (window._monitorWin === win) window._monitorWin = null; }); } catch (e) {}
   }
 
   /* ---- TOAST ---- */
   let toastTimer=null;
-  function showToast(msg,type){ const t=$('toast'); t.textContent=msg; t.className='toast show'+(type?' '+type:''); clearTimeout(toastTimer); toastTimer=setTimeout(()=>{ t.className='toast'+(type?' '+type:''); },1800); }
+  function showToast(msg,type){ const t2=$('toast'); t2.textContent=msg; t2.className='toast show'+(type?' '+type:''); clearTimeout(toastTimer); toastTimer=setTimeout(()=>{ t2.className='toast'+(type?' '+type:''); },1800); }
+
+  /* ---- HOW TO PLAY ---- */
+  const howtoPanel=$('howtoPanel'), btnHowto=$('btnHowto');
+  function openHowto(){ howtoPanel.classList.add('open'); btnHowto.classList.add('open'); btnHowto.setAttribute('aria-expanded','true'); }
+  function closeHowto(){ howtoPanel.classList.remove('open'); btnHowto.classList.remove('open'); btnHowto.setAttribute('aria-expanded','false'); }
+  function toggleHowto(){ if(howtoPanel.classList.contains('open')) closeHowto(); else openHowto(); }
+  btnHowto.addEventListener('click',e=>{ e.stopPropagation(); toggleHowto(); });
+  $('howtoClose').addEventListener('click',e=>{ e.stopPropagation(); closeHowto(); });
+  document.addEventListener('click',e=>{ if(!howtoPanel.classList.contains('open')) return; if(howtoPanel.contains(e.target)||btnHowto.contains(e.target)) return; closeHowto(); });
 
   /* ---- UI EVENT BINDINGS ---- */
   $('keypad').addEventListener('click',e=>{ const b=e.target.closest('button[data-k]'); if(b) pressKey(b.dataset.k); });
   $('fieldNum').addEventListener('click',()=>{ state.field='num'; renderFields(); });
   $('fieldAmt').addEventListener('click',()=>{ state.field='amount'; renderFields(); });
   $('currencyBadge').addEventListener('click',cycleCurrency);
+  $('langBadge').addEventListener('click',cycleLang);
   $('lotChip').addEventListener('click',openLotSheet);
   $('lotClose').addEventListener('click',closeSheet);
   $('backdrop').addEventListener('click',()=>{ closeSheet(); closeTicketPreview(); closeCancelledTicketSheet(); });
@@ -1413,7 +1856,7 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
   $('btnSales').addEventListener('click',()=>{ initSalesDates(); runSalesReport(); openModal('salesModal'); });
   $('btnResults').addEventListener('click',()=>{ initResultsDate(); runResults(); openModal('resultsModal'); const m=store.getMeta(SYNC_META_KEY); if(m){ try{ const j=JSON.parse(m); if(j.lastOk) updateSyncStatus('Last sync: '+fmtIsoShort(j.lastOk)+(j.lastDate?' · NY '+j.lastDate:''),'ok'); }catch(e){} } });
   $('btnTickets').addEventListener('click',openTicketsOptions);
-  $('btnMonitor').addEventListener('click',launchMonitor);   // ← opens INDEPENDENT popup window
+  $('btnMonitor').addEventListener('click',launchMonitor);
   $('btn_report_search').addEventListener('click',runSalesReport);
   $('btn_results_search').addEventListener('click',runResults);
   $('btn_sync_ny').addEventListener('click',()=>syncNYResults(true));
@@ -1421,7 +1864,7 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
   $('results_date').addEventListener('change',runResults);
   $('ticketSelect').addEventListener('change',onTicketSelectChange);
   $('btnTicketShow').addEventListener('click',()=>{ const b=$('ticketOptionsPreview'); if(b.style.display!=='none'){ b.style.display='none'; return; } renderTicketOptionsPreview($('ticketSelect').value); });
-  $('btnTicketPrint').addEventListener('click',()=>{ const c=$('ticketSelect').value; if(!c){ showToast('No ticket selected','err'); return; } renderTicketOptionsPreview(c); printModal('ticketsOptionsModal'); });
+  $('btnTicketPrint').addEventListener('click',()=>{ const c=$('ticketSelect').value; if(!c){ showToast(t('toastNoTicketSelected'),'err'); return; } renderTicketOptionsPreview(c); printModal('ticketsOptionsModal'); });
   $('btnTicketCancel').addEventListener('click',cancelSelectedTicket);
   $('btnConfirmCancelAction').addEventListener('click',executeCancelTicket);
   $('cancelledTicketPrint').addEventListener('click',printCancelledTicket);
@@ -1443,7 +1886,7 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
       } else if(e.key==='Escape'){
         e.preventDefault();
         closeModal('salesModal'); closeModal('resultsModal'); closeModal('ticketPayModal'); closeModal('ticketsOptionsModal'); closeModal('confirmCancelModal'); closeModal('monitorModal');
-        closeTicketPreview(); closeCancelledTicketSheet(); el.blur();
+        closeTicketPreview(); closeCancelledTicketSheet(); closeHowto(); el.blur();
       }
       return;
     }
@@ -1452,7 +1895,7 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
     if(e.key==='*'||/^[xX]$/.test(e.key)){ pressKey('*'); e.preventDefault(); return; }
     if(e.key==='Enter'){ pressKey('ENTER'); e.preventDefault(); return; }
     if(e.key==='Backspace'){ pressKey('DEL'); e.preventDefault(); return; }
-    if(e.key==='Escape'){ closeSheet(); closeTicketPreview(); closeCancelledTicketSheet(); closeAllModals(); }
+    if(e.key==='Escape'){ closeHowto(); closeSheet(); closeTicketPreview(); closeCancelledTicketSheet(); closeAllModals(); }
   });
 
   /* ---- BOOT ---- */
@@ -1462,8 +1905,10 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
     try{ info=await store.init(); }catch(e){ info={backendName:'memory'}; }
     if(info.backendName!=='localStorage'){
       const w=$('storageWarn'); if(w){ w.style.display='flex'; w.title=info.backendName==='sessionStorage'?'Tab-only storage — data lost if tab closes':'Session-only — data will not persist'; }
-      setTimeout(()=>showToast(info.backendName==='sessionStorage'?'Tab-only storage — data lost if tab closes':'Storage unavailable — data will not persist','err'),700);
+      setTimeout(()=>showToast(info.backendName==='sessionStorage'?t('toastStorageSession'):t('toastStorageNone'),'err'),700);
     }
+    // Language FIRST so every subsequent render is localized
+    currentLang = detectLang();
     currentCurrency=detectCurrency();
     updateCurrencyFormatter();
     migrateLotteryNames();
@@ -1473,10 +1918,8 @@ body[data-device="tablet"] .device-badge{background:rgba(251,191,36,.16);border-
     initSalesDates();
     initResultsDate();
     reconcileActiveLots();
-    renderChip();
-    renderFields();
-    renderBets();
-    refreshOpenCount();
+    // Apply all static translations + re-render dynamic sections
+    applyLanguage();
     tickClock();
     setInterval(tickClock,1000);
     startAutoSync();
